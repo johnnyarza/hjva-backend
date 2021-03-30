@@ -16,7 +16,8 @@ class UserController {
 
       const { name, email, password } = req.body;
       const user = await User.create({ name, email, password });
-      return res.json(user);
+      const { id, role } = user;
+      return res.json({ id, name, email, role });
     } catch (err) {
       return res.status(400).json(err);
     }
