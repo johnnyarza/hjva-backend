@@ -7,7 +7,7 @@ class SessionController {
   async store(req, res) {
     const schema = Yup.object().shape({
       password: Yup.string().required(),
-      email: Yup.string().email().required(),
+      email: Yup.string().email().required().lowercase(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -16,7 +16,7 @@ class SessionController {
 
     const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email: email.toLowerCase() } });
 
     if (!user) {
       return res.status(401).json({ error: 'Usuário não encontrado' });
