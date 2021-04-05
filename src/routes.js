@@ -3,6 +3,7 @@ import multer from 'multer';
 import multerConfig from './config/multer';
 
 import UserController from './app/controllers/UserController';
+import CategoryController from './app/controllers/CategoryController';
 import ProductController from './app/controllers/ProductController';
 import SessionController from './app/controllers/SessionController';
 import ProductFileController from './app/controllers/ProductFileController';
@@ -22,11 +23,11 @@ routes.use(auth);
 
 routes.put('/user', UserController.update);
 
-routes.post('/product', ProductController.store);
+routes.post('/category', CategoryController.store);
 
+routes.post('/product', ProductController.store);
 routes.put('/product/:id', ProductController.update);
 routes.delete('/product/:id', ProductController.delete);
-
 routes.post(
   '/product/:id/file',
   upload.single('file'),

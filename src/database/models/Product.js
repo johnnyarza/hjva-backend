@@ -7,7 +7,7 @@ class Product extends Model {
       {
         name: Sequelize.STRING,
         description: Sequelize.STRING,
-        category: Sequelize.STRING,
+        categoryId: { type: Sequelize.UUID, field: 'category_id' },
       },
       {
         hooks: {
@@ -25,6 +25,10 @@ class Product extends Model {
     this.hasMany(models.ProductFile, {
       foreignKey: 'product_id',
       as: 'file',
+    });
+    this.belongsTo(models.Category, {
+      foreignKey: 'category_id',
+      as: 'category',
     });
   }
 }

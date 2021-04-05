@@ -3,6 +3,7 @@ import * as Yup from 'yup';
 import Product from '../../database/models/Product';
 import User from '../../database/models/User';
 import File from '../../database/models/ProductFile';
+import Category from '../../database/models/Category';
 
 import Utils from '../utils/utils';
 
@@ -24,8 +25,25 @@ class ProductController {
         .status(403)
         .json({ error: 'Usuário não tem privilégios necessários' });
     }
+    const category = await Category.findOne({
+      where: {
+        name: req.body.category,
+      },
+    });
+    if (!category) {
+      return res.status(400).send('Categoria informada não foi encontrada');
+    }
+    const { id: categoryId } = category;
+    const { id } = await Product.create({ categoryId, ...req.body });
 
-    const product = await Product.create(req.body);
+    const product = await Product.findByPk(id, {
+      include: {
+        model: Category,
+        as: 'category',
+        attributes: ['name'],
+      },
+    });
+
     return res.json(product);
   }
 
@@ -33,6 +51,7 @@ class ProductController {
     const products = await Product.findAll({
       include: [
         { model: File, as: 'file', attributes: ['name', 'url', 'path'] },
+        { model: Category, as: 'category', attributes: ['name'] },
       ],
     });
     return res.json(products);
@@ -48,6 +67,7 @@ class ProductController {
     const product = await Product.findByPk(id, {
       include: [
         { model: File, as: 'file', attributes: ['name', 'url', 'path'] },
+        { model: Category, as: 'category', attributes: ['name'] },
       ],
     });
 
@@ -55,6 +75,7 @@ class ProductController {
   }
 
   async update(req, res) {
+    // acrescentar atualização de categoria
     const { id } = req.params;
 
     if (!id) {
