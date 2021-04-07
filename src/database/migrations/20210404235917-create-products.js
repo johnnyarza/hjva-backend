@@ -17,6 +17,7 @@ module.exports = {
         allowNull: false,
       },
       description: { type: DataTypes.STRING, allowNull: true },
+      price: { type: DataTypes.DECIMAL(22, 2), defaultValue: 0.0 },
       created_at: { type: DataTypes.DATE, allowNull: false },
       updated_at: { type: DataTypes.DATE, allowNull: false },
     });

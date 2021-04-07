@@ -27,12 +27,12 @@ class UserController {
   }
 
   async findById(req, res) {
-    const { id } = req.params;
+    const id = req.userId;
     if (!id) {
       return res.status(400).json({ error: 'Id do usuário não informado' });
     }
     const user = await User.findByPk(id, {
-      attributes: ['id', 'name', 'email', 'role'],
+      attributes: ['id', 'role'],
     });
 
     return res.json(user);
@@ -50,6 +50,10 @@ class UserController {
         password ? field.required().oneOf([Yup.ref('password')]) : field
       ),
     });
+
+    if (!req.body) {
+      return res.status(400).json({ error: 'Corpo da requisição vazio' });
+    }
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Erro de validação' });

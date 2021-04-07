@@ -13,6 +13,11 @@ class CategoryController {
     const category = await Category.create(req.body);
     return res.json(category);
   }
+
+  async index(req, res) {
+    const categories = await Category.findAll();
+    return res.json(categories);
+  }
 }
 
 export default new CategoryController();

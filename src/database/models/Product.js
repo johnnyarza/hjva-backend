@@ -7,7 +7,8 @@ class Product extends Model {
       {
         name: Sequelize.STRING,
         description: Sequelize.STRING,
-        categoryId: { type: Sequelize.UUID, field: 'category_id' },
+        category_id: { type: Sequelize.UUID },
+        price: Sequelize.DECIMAL,
       },
       {
         hooks: {

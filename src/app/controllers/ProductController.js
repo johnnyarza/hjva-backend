@@ -13,6 +13,7 @@ class ProductController {
       name: Yup.string().required(),
       category: Yup.string().required(),
       description: Yup.string(),
+      price: Yup.number(),
     });
 
     if (!(await schema.isValid(req.body))) {
@@ -33,8 +34,8 @@ class ProductController {
     if (!category) {
       return res.status(400).send('Categoria informada não foi encontrada');
     }
-    const { id: categoryId } = category;
-    const { id } = await Product.create({ categoryId, ...req.body });
+    const { id: category_id } = category;
+    const { id } = await Product.create({ category_id, ...req.body });
 
     const product = await Product.findByPk(id, {
       include: {
@@ -48,12 +49,33 @@ class ProductController {
   }
 
   async index(req, res) {
-    const products = await Product.findAll({
+    const data = await Product.findAll({
       include: [
         { model: File, as: 'file', attributes: ['name', 'url', 'path'] },
         { model: Category, as: 'category', attributes: ['name'] },
       ],
     });
+    const products = data.map(
+      ({
+        id,
+        name,
+        description,
+        price,
+        file,
+        category,
+        createdAt,
+        updatedAt,
+      }) => ({
+        id,
+        name,
+        category: category.name,
+        description,
+        price,
+        file,
+        createdAt,
+        updatedAt,
+      })
+    );
     return res.json(products);
   }
 
@@ -64,12 +86,33 @@ class ProductController {
       return res.status(400).json({ error: 'Id do produto não informado' });
     }
 
-    const product = await Product.findByPk(id, {
+    const data = await Product.findByPk(id, {
       include: [
         { model: File, as: 'file', attributes: ['name', 'url', 'path'] },
         { model: Category, as: 'category', attributes: ['name'] },
       ],
     });
+
+    const {
+      id: idNew,
+      name,
+      description,
+      file,
+      category,
+      createdAt,
+      updatedAt,
+      price,
+    } = data;
+    const product = {
+      id: idNew,
+      name,
+      category: category.name,
+      description,
+      price,
+      file,
+      createdAt,
+      updatedAt,
+    };
 
     return res.json(product);
   }
