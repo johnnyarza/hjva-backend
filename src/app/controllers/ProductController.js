@@ -37,13 +37,15 @@ class ProductController {
     const { id: category_id } = category;
     const { id } = await Product.create({ category_id, ...req.body });
 
-    const product = await Product.findByPk(id, {
+    const response = await Product.findByPk(id, {
       include: {
         model: Category,
         as: 'category',
         attributes: ['name'],
       },
     });
+    const product = response.dataValues;
+    product.category = product.category.name;
 
     return res.json(product);
   }
