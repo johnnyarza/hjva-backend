@@ -27,6 +27,7 @@ routes.get('/user', UserController.findById);
 routes.post('/category', CategoryController.store);
 routes.get('/categories', CategoryController.index);
 routes.get('/category/byname', CategoryController.findByName);
+routes.delete('/category/:id', CategoryController.delete);
 
 routes.post('/product', ProductController.store);
 routes.put('/product/:id', ProductController.update);

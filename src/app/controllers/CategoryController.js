@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import Category from '../../database/models/Category';
+import Product from '../../database/models/Product';
 
 class CategoryController {
   async store(req, res) {
@@ -41,6 +42,25 @@ class CategoryController {
     });
 
     return res.json(category);
+  }
+
+  async delete(req, res) {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Id da categoria não informado' });
+    }
+    const product = await Product.findOne({ where: { category_id: id } });
+
+    if (product) {
+      return res
+        .status(403)
+        .json({ error: 'Existe produto usando essa categoria' });
+    }
+
+    await Category.destroy({ where: { id } });
+
+    return res.json('Categoria deletada');
   }
 }
 
