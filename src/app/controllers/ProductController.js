@@ -126,15 +126,22 @@ class ProductController {
     if (!id) {
       return res.status(400).json({ error: 'Id do produto não foi informado' });
     }
+
     const schema = Yup.object().shape({
       name: Yup.string(),
+      category: Yup.string(),
       description: Yup.string(),
+      price: Yup.number(),
     });
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Erro de validação' });
     }
+
     const user = await User.findByPk(req.userId);
+    const category = await Category.findOne({
+      where: { name: req.body.category.name },
+    });
 
     if (!Utils.productsGrantedAccess.find((role) => role === user.role)) {
       return res
