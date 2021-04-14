@@ -139,9 +139,16 @@ class ProductController {
     }
 
     const user = await User.findByPk(req.userId);
-    const category = await Category.findOne({
-      where: { name: req.body.category.name },
-    });
+
+    const category = (
+      await Category.findOne({
+        where: { name: req.body.category },
+      })
+    ).dataValues;
+
+    if (!category) {
+      return res.status(400).json({ error: 'Categoria não encontrada' });
+    }
 
     if (!Utils.productsGrantedAccess.find((role) => role === user.role)) {
       return res
@@ -149,10 +156,23 @@ class ProductController {
         .json({ error: 'Usuário não tem privilégios necessários' });
     }
 
-    const product = await Product.update(req.body, {
-      returning: true,
+    req.body.category_id = category.id;
+
+    await Product.update(req.body, {
       where: { id },
     });
+
+    const product = (
+      await Product.findByPk(id, {
+        include: [
+          { model: File, as: 'file', attributes: ['name', 'url', 'path'] },
+          { model: Category, as: 'category', attributes: ['id', 'name'] },
+        ],
+      })
+    ).dataValues;
+
+    delete product.category_id;
+    product.category = product.category.name;
 
     return res.json(product);
   }

@@ -4,10 +4,11 @@ import User from './models/User';
 import Product from './models/Product';
 import ProductFile from './models/ProductFile';
 import Category from './models/Category';
+import Role from './models/Role';
 
 import config from '../config/database';
 
-const models = [User, Product, ProductFile, Category];
+const models = [User, Product, ProductFile, Category, Role];
 
 class Database {
   constructor() {

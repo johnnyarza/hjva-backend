@@ -9,6 +9,7 @@ import SessionController from './app/controllers/SessionController';
 import ProductFileController from './app/controllers/ProductFileController';
 
 import auth from './app/middlewares/auth';
+import RoleController from './app/controllers/RoleController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -21,8 +22,16 @@ routes.get('/product/:id', ProductController.findById);
 
 routes.use(auth);
 
+routes.get('/roles', RoleController.index);
+
 routes.put('/user', UserController.update);
+routes.put('/user/role/:userToUpdateRoleId', UserController.updateUserRole);
+routes.put(
+  '/user/password/:userToUpdatePasswordId',
+  UserController.resetUserPassword
+);
 routes.get('/user', UserController.findById);
+routes.get('/users', UserController.index);
 
 routes.post('/category', CategoryController.store);
 routes.get('/categories', CategoryController.index);

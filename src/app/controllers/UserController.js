@@ -1,7 +1,24 @@
 import * as Yup from 'yup';
 import User from '../../database/models/User';
+import Role from '../../database/models/Role';
 
 class UserController {
+  async index(req, res) {
+    try {
+      const user = await User.findByPk(req.userId);
+      if (user.role !== 'admin') {
+        return res
+          .status(403)
+          .json({ error: 'Usuário não tem privilégios necessários' });
+      }
+      const users = await User.findAll({ attributes: ['id', 'name', 'role'] });
+
+      return res.json(users);
+    } catch (err) {
+      return res.status(500).json(err.message);
+    }
+  }
+
   async store(req, res) {
     try {
       const schema = Yup.object().shape({
@@ -22,19 +39,22 @@ class UserController {
       });
       return res.json(user);
     } catch (err) {
-      return res.status(400).json(err);
+      return res.status(500).json(err);
     }
   }
 
   async findById(req, res) {
     const id = req.userId;
+
     if (!id) {
       return res.status(400).json({ error: 'Id do usuário não informado' });
     }
     const user = await User.findByPk(id, {
       attributes: ['id', 'role'],
     });
-
+    if (!user) {
+      return res.status(403).json({ error: 'Usuário não encontrado' });
+    }
     return res.json(user);
   }
 
@@ -49,6 +69,7 @@ class UserController {
       confirmPassword: Yup.string().when('password', (password, field) =>
         password ? field.required().oneOf([Yup.ref('password')]) : field
       ),
+      role: Yup.string(),
     });
 
     if (!req.body) {
@@ -76,11 +97,133 @@ class UserController {
       return res.status(401).json({ error: 'Senha inválida' });
     }
     if (req.body.email) req.body.email = req.body.email.toLowerCase();
+
     const response = await user.update(req.body);
     const newUser = await User.findByPk(response.id);
 
     const { id, name } = newUser;
     return res.json({ id, name, email: newUser.email });
+  }
+
+  async updateUserRole(req, res) {
+    try {
+      const schema = Yup.object().shape({
+        role: Yup.string().required('Role não informado'),
+      });
+      const { userToUpdateRoleId } = req.params;
+
+      if (!userToUpdateRoleId) {
+        return res.status(400).json({ error: 'Role não informado' });
+      }
+
+      if (!(await schema.isValid(req.body))) {
+        return res.status(400).json({ error: 'Erro de validação' });
+      }
+
+      const { dataValues: userToUpdaterole } = await User.findByPk(
+        userToUpdateRoleId
+      );
+
+      if (!userToUpdaterole) {
+        return res
+          .status(400)
+          .json({ error: 'Usuário a ser atulizado não encontrado' });
+      }
+
+      const { dataValues: userUpdating } = await User.findByPk(req.userId);
+
+      if (!userUpdating) {
+        return res
+          .status(400)
+          .json({ error: 'Usuário solicitante não encontrado' });
+      }
+
+      if (userUpdating.role !== 'admin') {
+        return res.status(403).json({
+          error: 'Usuário solicitante não tem privelégios suficientes',
+        });
+      }
+      const roleExists = await Role.findOne({ where: { name: req.body.role } });
+
+      if (!roleExists) {
+        return res.status(400).json({ error: 'Role informado não existe' });
+      }
+
+      await User.update(
+        { role: req.body.role },
+        {
+          where: {
+            id: userToUpdateRoleId,
+          },
+        }
+      );
+
+      const { dataValues: updatedUser } = await User.findByPk(
+        userToUpdateRoleId,
+        {
+          attributes: ['id', 'name', 'email', 'role'],
+        }
+      );
+
+      return res.json(updatedUser);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
+  }
+
+  async resetUserPassword(req, res) {
+    try {
+      const schema = Yup.object().shape({
+        password: Yup.string().required(),
+        confirmPassword: Yup.string()
+          .required()
+          .oneOf([Yup.ref('password')], 'As senhas devem ser iguais'),
+      });
+      const { userToUpdatePasswordId } = req.params;
+
+      if (!userToUpdatePasswordId) {
+        return res.status(400).json({ error: 'Id não informado' });
+      }
+
+      if (!(await schema.isValid(req.body))) {
+        return res.status(400).json({ error: 'Erro de validação' });
+      }
+
+      const userToUpdatePassword = await User.findByPk(userToUpdatePasswordId);
+
+      if (!userToUpdatePassword) {
+        return res
+          .status(400)
+          .json({ error: 'Usuário a ser atulizado não encontrado' });
+      }
+
+      const { dataValues: userUpdating } = await User.findByPk(req.userId);
+
+      if (!userUpdating) {
+        return res
+          .status(400)
+          .json({ error: 'Usuário solicitante não encontrado' });
+      }
+
+      if (userUpdating.role !== 'admin') {
+        return res.status(403).json({
+          error: 'Usuário solicitante não tem privelégios suficientes',
+        });
+      }
+
+      await userToUpdatePassword.update({ password: req.body.password });
+
+      const { dataValues: updatedUser } = await User.findByPk(
+        userToUpdatePasswordId,
+        {
+          attributes: ['id', 'name', 'email', 'role'],
+        }
+      );
+
+      return res.json(updatedUser);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   }
 }
 
