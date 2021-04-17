@@ -7,8 +7,9 @@ import Category from './models/Category';
 import Role from './models/Role';
 
 import config from '../config/database';
+import Avatar from './models/Avatar';
 
-const models = [User, Product, ProductFile, Category, Role];
+const models = [User, Product, ProductFile, Category, Role, Avatar];
 
 class Database {
   constructor() {

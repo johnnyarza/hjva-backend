@@ -10,6 +10,7 @@ import ProductFileController from './app/controllers/ProductFileController';
 
 import auth from './app/middlewares/auth';
 import RoleController from './app/controllers/RoleController';
+import AvatarFileController from './app/controllers/AvatarFileController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -25,6 +26,7 @@ routes.use(auth);
 routes.get('/roles', RoleController.index);
 
 routes.put('/user', UserController.update);
+routes.delete('/user/:userToBeDeleteId', UserController.deleteUser);
 routes.put('/user/role/:userToUpdateRoleId', UserController.updateUserRole);
 routes.put(
   '/user/password/:userToUpdatePasswordId',
@@ -32,6 +34,7 @@ routes.put(
 );
 routes.get('/user', UserController.findById);
 routes.get('/users', UserController.index);
+routes.post('/users/avatar', upload.single('file'), AvatarFileController.store);
 
 routes.post('/category', CategoryController.store);
 routes.get('/categories', CategoryController.index);

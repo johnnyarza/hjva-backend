@@ -3,6 +3,47 @@ import User from '../../database/models/User';
 import Role from '../../database/models/Role';
 
 class UserController {
+  async deleteUser(req, res) {
+    try {
+      const { userToBeDeleteId } = req.params;
+      if (!userToBeDeleteId) {
+        return res
+          .status(400)
+          .json({ error: 'Id do usuário a ser deletado não informado' });
+      }
+      const { dataValues: userRequesting } = await User.findByPk(req.userId);
+
+      if (!userRequesting) {
+        return res.status(403).json({
+          error: 'Usuário que está solicitando não foi encontrado',
+        });
+      }
+
+      if (req.id !== userToBeDeleteId && userRequesting.role !== 'admin') {
+        return res.status(403).json({
+          error: 'Apenas administradores podem apagar contas de terceiros',
+        });
+      }
+
+      if (req.userId === userToBeDeleteId && userRequesting.role === 'admin') {
+        const count = await User.count({ where: { name: 'admin' } });
+        if (count <= 1) {
+          return res.status(400).json({
+            message: 'Deve existir pelo menos 1 administrador cadastrado',
+          });
+        }
+      }
+
+      const affectedLines = await User.destroy({
+        where: { id: userToBeDeleteId },
+      });
+
+      return res.json(affectedLines);
+    } catch (err) {
+      return res.status(500).json(err.message);
+    }
+  }
+
   async index(req, res) {
     try {
       const user = await User.findByPk(req.userId);
@@ -56,6 +97,10 @@ class UserController {
       return res.status(403).json({ error: 'Usuário não encontrado' });
     }
     return res.json(user);
+  }
+
+  async avatarPicture(req, res) {
+    res.json('Ola arquivo');
   }
 
   async update(req, res) {

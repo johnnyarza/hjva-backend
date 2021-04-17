@@ -29,4 +29,21 @@ const storageType = {
   }),
 };
 
-export default { storage: storageType[process.env.STORAGE_TYPE] };
+const multerConfig = {
+  storage: storageType[process.env.STORAGE_TYPE],
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = [
+      'image/jpeg',
+      'image/pjpeg',
+      'image/png',
+      'image/gif',
+    ];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid Format Type'));
+    }
+  },
+};
+
+export default multerConfig;
