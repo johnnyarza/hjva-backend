@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    queryInterface.createTable('avatar', {
+    queryInterface.createTable('avatars', {
       id: {
         type: DataTypes.UUID,
         allowNull: false,
@@ -13,7 +13,8 @@ module.exports = {
         references: { model: 'users', key: 'id' },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
-        allowNull: true,
+        allowNull: false,
+        unique: true,
       },
       name: { type: DataTypes.STRING, allowNull: false },
       path: { type: DataTypes.STRING, allowNull: false, unique: true },
@@ -23,11 +24,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
+    queryInterface.dropTable('avatar');
   },
 };

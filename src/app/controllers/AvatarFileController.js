@@ -15,11 +15,32 @@ class AvatarFileController {
         name = originalname;
         path = filename;
       }
+      const avatarExists = await Avatar.findOne({
+        where: {
+          user_id: userId,
+        },
+      });
+      let file;
 
-      // no
-      res.json({ userId, name, path });
+      if (avatarExists) {
+        await avatarExists.update({ name, path });
+        file = await Avatar.findOne({
+          where: {
+            user_id: userId,
+          },
+        });
+        return res.json(file);
+      }
+
+      file = await Avatar.create({
+        name,
+        path,
+        user_id: userId,
+      });
+
+      return res.json(file);
     } catch (error) {
-      res.status(500).json(error.message);
+      return res.status(500).json(error);
     }
   }
 }

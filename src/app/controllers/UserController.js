@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 import User from '../../database/models/User';
 import Role from '../../database/models/Role';
+import Avatar from '../../database/models/Avatar';
 
 class UserController {
   async deleteUser(req, res) {
@@ -52,7 +53,13 @@ class UserController {
           .status(403)
           .json({ error: 'Usuário não tem privilégios necessários' });
       }
-      const users = await User.findAll({ attributes: ['id', 'name', 'role'] });
+      const users = await User.findAll({
+        attributes: ['id', 'name', 'role'],
+        include: {
+          model: Avatar,
+          as: 'avatar',
+        },
+      });
 
       return res.json(users);
     } catch (err) {
@@ -92,15 +99,15 @@ class UserController {
     }
     const user = await User.findByPk(id, {
       attributes: ['id', 'role'],
+      include: {
+        model: Avatar,
+        as: 'avatar',
+      },
     });
     if (!user) {
       return res.status(403).json({ error: 'Usuário não encontrado' });
     }
     return res.json(user);
-  }
-
-  async avatarPicture(req, res) {
-    res.json('Ola arquivo');
   }
 
   async update(req, res) {
