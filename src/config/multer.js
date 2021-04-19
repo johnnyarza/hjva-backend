@@ -11,7 +11,8 @@ const storageType = {
     filename: (req, file, cb) => {
       crypto.randomBytes(16, (err, res) => {
         if (err) return cb(err);
-        return cb(null, res.toString('hex') + extname(file.originalname));
+        file.key = `${res.toString('hex') + extname(file.originalname)}`;
+        return cb(null, file.key);
       });
     },
   }),
@@ -19,11 +20,12 @@ const storageType = {
     s3: new aws.S3(),
     bucket: process.env.BUCKET_NAME,
     contentType: multerS3.AUTO_CONTENT_TYPE,
-    ACL: 'public-read',
+    acl: 'public-read',
     key: (req, file, cb) => {
       crypto.randomBytes(16, (err, res) => {
         if (err) return cb(err);
-        return cb(null, res.toString('hex') + extname(file.originalname));
+        file.key = `${res.toString('hex') + extname(file.originalname)}`;
+        return cb(null, file.key);
       });
     },
   }),

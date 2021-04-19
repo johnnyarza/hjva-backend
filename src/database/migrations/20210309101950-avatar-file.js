@@ -17,7 +17,12 @@ module.exports = {
         unique: true,
       },
       name: { type: DataTypes.STRING, allowNull: false },
-      path: { type: DataTypes.STRING, allowNull: false, unique: true },
+      key: { type: DataTypes.STRING, allowNull: false, unique: true },
+      url: {
+        type: DataTypes.STRING,
+        unique: true,
+        defaultValue: '',
+      },
       created_at: { type: DataTypes.DATE, allowNull: false },
       updated_at: { type: DataTypes.DATE, allowNull: false },
     });

@@ -3,7 +3,9 @@ import 'dotenv/config';
 import express from 'express';
 import morgan from 'morgan';
 import path from 'path';
+import Youch from 'youch';
 import cors from 'cors';
+import 'express-async-errors';
 import routes from './routes';
 import './database/index';
 
@@ -26,6 +28,16 @@ class App {
 
   routes() {
     this.server.use(routes);
+    this.server.use(this.defaultErrorHandler);
+  }
+
+  async defaultErrorHandler(err, req, res, next) {
+    const errors = await new Youch(err, req).toJSON();
+
+    if (res.headersSent) {
+      return next(errors);
+    }
+    return res.status(500).json(errors);
   }
 }
 
