@@ -53,10 +53,12 @@ class ProductController {
   async index(req, res) {
     const data = await Product.findAll({
       include: [
-        { model: File, as: 'file', attributes: ['name', 'url', 'path'] },
+        { model: File, as: 'file' },
         { model: Category, as: 'category', attributes: ['name'] },
       ],
+      order: [['name', 'ASC']],
     });
+
     const products = data.map(
       ({
         id,
@@ -90,7 +92,7 @@ class ProductController {
 
     const data = await Product.findByPk(id, {
       include: [
-        { model: File, as: 'file', attributes: ['name', 'url', 'path'] },
+        { model: File, as: 'file' },
         { model: Category, as: 'category', attributes: ['name'] },
       ],
     });
@@ -165,7 +167,7 @@ class ProductController {
     const product = (
       await Product.findByPk(id, {
         include: [
-          { model: File, as: 'file', attributes: ['name', 'url', 'path'] },
+          { model: File, as: 'file' },
           { model: Category, as: 'category', attributes: ['id', 'name'] },
         ],
       })

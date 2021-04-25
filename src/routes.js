@@ -51,4 +51,6 @@ routes.post(
   ProductFileController.store
 );
 
+routes.delete('/product/:id/file', ProductFileController.delete);
+
 export default routes;

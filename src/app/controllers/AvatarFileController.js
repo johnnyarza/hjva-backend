@@ -4,6 +4,7 @@ class AvatarFileController {
   async store(req, res, next) {
     try {
       const { userId } = req;
+
       const { originalname: name, size, key, location: url = '' } = req.file;
 
       const avatarExists = await Avatar.findOne({

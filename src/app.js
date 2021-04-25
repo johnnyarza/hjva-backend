@@ -33,6 +33,7 @@ class App {
 
   async defaultErrorHandler(err, req, res, next) {
     const errors = await new Youch(err, req).toJSON();
+    console.log(errors);
 
     if (res.headersSent) {
       return next(errors);

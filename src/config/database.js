@@ -1,6 +1,6 @@
 module.exports = {
   dialect: 'postgres',
-  host: '192.168.1.14',
+  host: 'kkreco.duckdns.org',
   username: 'postgres',
   password: 'docker',
   database: 'hjva',
