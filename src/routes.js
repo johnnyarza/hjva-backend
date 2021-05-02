@@ -11,6 +11,7 @@ import ProductFileController from './app/controllers/ProductFileController';
 import auth from './app/middlewares/auth';
 import RoleController from './app/controllers/RoleController';
 import AvatarFileController from './app/controllers/AvatarFileController';
+import CLientController from './app/controllers/ClientController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -52,5 +53,8 @@ routes.post(
 );
 
 routes.delete('/product/:id/file', ProductFileController.delete);
+
+routes.post('/client', CLientController.store);
+routes.get('/clients', CLientController.index);
 
 export default routes;

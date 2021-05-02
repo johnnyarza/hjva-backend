@@ -5,11 +5,12 @@ import Product from './models/Product';
 import ProductFile from './models/ProductFile';
 import Category from './models/Category';
 import Role from './models/Role';
+import Avatar from './models/Avatar';
+import Client from './models/Client';
 
 import config from '../config/database';
-import Avatar from './models/Avatar';
 
-const models = [User, Product, ProductFile, Category, Role, Avatar];
+const models = [Client, User, Product, ProductFile, Category, Role, Avatar];
 
 class Database {
   constructor() {
