@@ -7,10 +7,20 @@ import Category from './models/Category';
 import Role from './models/Role';
 import Avatar from './models/Avatar';
 import Client from './models/Client';
+import Provider from './models/Provider';
 
 import config from '../config/database';
 
-const models = [Client, User, Product, ProductFile, Category, Role, Avatar];
+const models = [
+  Client,
+  User,
+  Product,
+  ProductFile,
+  Category,
+  Role,
+  Avatar,
+  Provider,
+];
 
 class Database {
   constructor() {

@@ -1,7 +1,7 @@
 import Sequelize, { Model } from 'sequelize';
 import { v4 as uuid } from 'uuid';
 
-class Client extends Model {
+class Provider extends Model {
   static init(sequelize) {
     super.init(
       {
@@ -13,8 +13,8 @@ class Client extends Model {
       },
       {
         hooks: {
-          beforeCreate: (client, _) => {
-            client.id = uuid();
+          beforeCreate: (provider, _) => {
+            provider.id = uuid();
           },
         },
         sequelize,
@@ -24,4 +24,4 @@ class Client extends Model {
   }
 }
 
-export default Client;
+export default Provider;

@@ -12,6 +12,7 @@ import auth from './app/middlewares/auth';
 import RoleController from './app/controllers/RoleController';
 import AvatarFileController from './app/controllers/AvatarFileController';
 import CLientController from './app/controllers/ClientController';
+import ProviderController from './app/controllers/ProviderController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -55,6 +56,13 @@ routes.post(
 routes.delete('/product/:id/file', ProductFileController.delete);
 
 routes.post('/client', CLientController.store);
+routes.put('/client/:id', CLientController.update);
+routes.delete('/client/:id', CLientController.delete);
 routes.get('/clients', CLientController.index);
+
+routes.post('/provider', ProviderController.store);
+routes.put('/provider/:id', ProviderController.update);
+routes.delete('/provider/:id', ProviderController.delete);
+routes.get('/providers', ProviderController.index);
 
 export default routes;

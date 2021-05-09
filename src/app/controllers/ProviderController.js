@@ -1,25 +1,26 @@
 import * as Yup from 'yup';
-import Client from '../../database/models/Client';
+import Provider from '../../database/models/Provider';
 import User from '../../database/models/User';
 
-class ClientController {
+class ProviderController {
   async store(req, res, next) {
     try {
       const schema = Yup.object().shape({
         name: Yup.string().required(),
-        email: Yup.string().email(),
+        email: Yup.string().email().notRequired(),
         address: Yup.string(),
         phone: Yup.string(),
         notes: Yup.string(),
       });
+      console.log(req.body);
 
       if (!(await schema.isValid(req.body))) {
         return res.status(400).json({ error: 'Validation error' });
       }
 
-      const client = await Client.create(req.body);
+      const provider = await Provider.create(req.body);
 
-      return res.json(client);
+      return res.json(provider);
     } catch (error) {
       return next(error);
     }
@@ -27,8 +28,9 @@ class ClientController {
 
   async index(req, res, next) {
     try {
-      const clients = await Client.findAll();
-      return res.json(clients);
+      const providers = await Provider.findAll();
+
+      return res.json(providers);
     } catch (error) {
       return next(error);
     }
@@ -45,20 +47,24 @@ class ClientController {
       });
 
       if (!id) {
-        return res.status(400).json({ error: 'Client id não informado' });
+        return res.status(400).json({ error: 'Provider id não informado' });
       }
 
       if (!(await schema.isValid(req.body))) {
         return res.status(400).json({ error: 'Validation error' });
       }
 
-      await Client.update(req.body, {
+      await Provider.update(req.body, {
         where: { id },
       });
 
-      const client = await Client.findByPk(id);
+      const provider = await Provider.findByPk(id);
 
-      return res.json(client);
+      if (!provider) {
+        return res.status(404).json({ error: 'Provider not found' });
+      }
+
+      return res.json(provider);
     } catch (error) {
       return next(error);
     }
@@ -83,7 +89,7 @@ class ClientController {
           .json({ error: `Usuário não tem privilégios suficientes` });
       }
 
-      const affectedRows = await Client.destroy({ where: { id } });
+      const affectedRows = await Provider.destroy({ where: { id } });
 
       return res.json(affectedRows);
     } catch (error) {
@@ -92,4 +98,4 @@ class ClientController {
   }
 }
 
-export default new ClientController();
+export default new ProviderController();

@@ -9,6 +9,7 @@ module.exports = {
         primaryKey: true,
       },
       name: { type: DataTypes.STRING, allowNull: false, unique: true },
+      email: { type: DataTypes.STRING, allowNull: true, unique: true },
       address: { type: DataTypes.STRING, allowNull: true },
       phone: { type: DataTypes.STRING, allowNull: true },
       notes: { type: DataTypes.STRING, allowNull: true },
