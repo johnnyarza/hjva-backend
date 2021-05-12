@@ -8,6 +8,7 @@ import Role from './models/Role';
 import Avatar from './models/Avatar';
 import Client from './models/Client';
 import Provider from './models/Provider';
+import Material from './models/Material';
 
 import config from '../config/database';
 
@@ -20,6 +21,7 @@ const models = [
   Role,
   Avatar,
   Provider,
+  Material,
 ];
 
 class Database {

@@ -13,6 +13,7 @@ import RoleController from './app/controllers/RoleController';
 import AvatarFileController from './app/controllers/AvatarFileController';
 import CLientController from './app/controllers/ClientController';
 import ProviderController from './app/controllers/ProviderController';
+import MaterialController from './app/controllers/MaterialController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -64,5 +65,10 @@ routes.post('/provider', ProviderController.store);
 routes.put('/provider/:id', ProviderController.update);
 routes.delete('/provider/:id', ProviderController.delete);
 routes.get('/providers', ProviderController.index);
+
+routes.post('/material', MaterialController.store);
+routes.get('/materials', MaterialController.index);
+routes.put('/material/:id', MaterialController.update);
+routes.delete('/material/:id', MaterialController.delete);
 
 export default routes;
