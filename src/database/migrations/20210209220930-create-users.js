@@ -15,7 +15,7 @@ module.exports = {
         validate: { isIn: [['admin', 'office', 'seller', 'lab', 'common']] },
         references: { model: 'roles', key: 'name' },
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onDelete: 'RESTRICT',
         defaultValue: 'comum',
         allowNull: false,
       },

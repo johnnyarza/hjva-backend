@@ -9,6 +9,7 @@ import Avatar from './models/Avatar';
 import Client from './models/Client';
 import Provider from './models/Provider';
 import Material from './models/Material';
+import Measure from './models/Measure';
 
 import config from '../config/database';
 
@@ -22,6 +23,7 @@ const models = [
   Avatar,
   Provider,
   Material,
+  Measure,
 ];
 
 class Database {

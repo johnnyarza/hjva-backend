@@ -2,31 +2,70 @@ import * as Yup from 'yup';
 import Material from '../../database/models/Material';
 import Provider from '../../database/models/Provider';
 import User from '../../database/models/User';
+import Category from '../../database/models/Category';
+import Measure from '../../database/models/Measure';
 
 class MaterialController {
   async store(req, res, next) {
     try {
       const schema = Yup.object().shape({
         name: Yup.string().required(),
+        categoryId: Yup.string().required(),
         providerId: Yup.string().required(),
+        measurementId: Yup.string().required(),
         notes: Yup.string(),
       });
 
       if (!(await schema.isValid(req.body))) {
-        return res.status(400).json({ error: 'Erro de validação' });
+        return res.status(400).json({ message: 'Erro de validação' });
       }
 
       const provider = await Provider.findByPk(req.body.providerId);
+      const category = await Category.findByPk(req.body.categoryId);
+      const measurement = await Measure.findByPk(req.body.measurementId);
 
-      if (!provider) {
-        return res.status(404).json({ error: 'Provider not found' });
+      if (!provider || !category || !measurement) {
+        let message;
+        if (!provider) message = 'Provider';
+        if (!category) message = 'Category';
+        if (!measurement) message = 'Measure';
+        return res.status(404).json({
+          message: `${message} not found`,
+        });
       }
-      const { name, providerId: provider_id, notes } = req.body;
 
-      const material = await Material.create({
+      const {
+        name,
+        providerId: provider_id,
+        categoryId: category_id,
+        measurementId: measurement_id,
+        notes,
+      } = req.body;
+
+      let material = await Material.create({
         name,
         provider_id,
+        category_id,
+        measurement_id,
         notes,
+      });
+
+      material = await Material.findByPk(material.id, {
+        attributes: ['id', 'name', 'notes', 'created_at', 'updated_at'],
+        include: [
+          {
+            model: Provider,
+            as: 'provider',
+          },
+          {
+            model: Category,
+            as: 'category',
+          },
+          {
+            model: Measure,
+            as: 'measurement',
+          },
+        ],
       });
 
       return res.json(material);
@@ -39,10 +78,20 @@ class MaterialController {
     try {
       const materials = await Material.findAll({
         attributes: ['id', 'name', 'notes', 'created_at', 'updated_at'],
-        include: {
-          model: Provider,
-          as: 'provider',
-        },
+        include: [
+          {
+            model: Provider,
+            as: 'provider',
+          },
+          {
+            model: Category,
+            as: 'category',
+          },
+          {
+            model: Measure,
+            as: 'measurement',
+          },
+        ],
       });
       return res.json(materials);
     } catch (error) {
@@ -58,20 +107,21 @@ class MaterialController {
 
       const schema = Yup.object().shape({
         name: Yup.string(),
+        categoryId: Yup.string(),
         providerId: Yup.string(),
         notes: Yup.string(),
       });
 
       if (!id) {
-        return res.status(400).json({ error: 'Product id is empty' });
+        return res.status(400).json({ message: 'Product id is empty' });
       }
 
       if (!(await schema.isValid(req.body))) {
-        return res.status(400).json({ error: 'Validation error' });
+        return res.status(400).json({ message: 'Validation error' });
       }
 
       if (!requestingUser) {
-        return res.status(404).json({ error: 'Requesting user not found' });
+        return res.status(404).json({ message: 'Requesting user not found' });
       }
 
       const { role } = requestingUser;
@@ -79,27 +129,41 @@ class MaterialController {
       if (!(role === 'admin' || role === 'escritorio')) {
         return res
           .status(403)
-          .json({ error: 'User does not have enough privileges' });
+          .json({ message: 'User does not have enough privileges' });
       }
 
-      const { providerId: provider_id } = req.body;
+      const { providerId: provider_id, categoryId: category_id } = req.body;
 
       if (provider_id) {
         const provider = await Provider.findByPk(req.body.providerId);
         if (!provider) {
-          return res.status(404).json({ error: 'Provider not found' });
+          return res.status(404).json({ message: 'Provider not found' });
         }
         req.body.provider_id = provider_id;
+      }
+
+      if (category_id) {
+        const category = await Category.findByPk(req.body.categoryId);
+        if (!category) {
+          return res.status(404).json({ message: 'Category not found' });
+        }
+        req.body.category_id = category_id;
       }
 
       await Material.update(req.body, { where: { id } });
 
       const material = await Material.findByPk(id, {
         attributes: ['id', 'name', 'notes', 'created_at', 'updated_at'],
-        include: {
-          model: Provider,
-          as: 'provider',
-        },
+        include: [
+          {
+            model: Provider,
+            as: 'provider',
+          },
+          {
+            model: Category,
+            as: 'category',
+          },
+        ],
       });
 
       return res.json(material);
@@ -114,16 +178,16 @@ class MaterialController {
       const { userId: requestingId } = req;
 
       if (!id) {
-        return res.status(400).json({ error: 'Product id is empty' });
+        return res.status(400).json({ message: 'Product id is empty' });
       }
       if (!requestingId) {
-        return res.status(400).json({ error: 'Requesting user id is empty' });
+        return res.status(400).json({ message: 'Requesting user id is empty' });
       }
 
       const requestingUser = await User.findByPk(requestingId);
 
       if (!requestingUser) {
-        return res.status(404).json({ error: 'Requesting user not found' });
+        return res.status(404).json({ message: 'Requesting user not found' });
       }
 
       const { role } = requestingUser;
@@ -131,7 +195,7 @@ class MaterialController {
       if (!(role === 'admin' || role === 'escritorio')) {
         return res
           .status(403)
-          .json({ error: 'User does not have enough privileges' });
+          .json({ message: 'User does not have enough privileges' });
       }
 
       const affectedRows = await Material.destroy({ where: { id } });

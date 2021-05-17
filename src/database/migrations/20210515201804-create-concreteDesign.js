@@ -2,29 +2,15 @@ const { DataTypes } = require('sequelize');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    queryInterface.createTable('materials', {
+    queryInterface.createTable('concrete_designs', {
       id: {
         type: DataTypes.UUID,
         allowNull: false,
         primaryKey: true,
       },
-      provider_id: {
+      concrete_design_materials_id: {
         type: DataTypes.UUID,
-        references: { model: 'providers', key: 'id' },
-        onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT',
-        allowNull: false,
-      },
-      category_id: {
-        type: DataTypes.UUID,
-        references: { model: 'categories', key: 'id' },
-        onUpdate: 'CASCADE',
-        onDelete: 'RESTRICT',
-        allowNull: false,
-      },
-      measurement_id: {
-        type: DataTypes.UUID,
-        references: { model: 'measurements', key: 'id' },
+        references: { model: 'concrete_design_materials', key: 'id' },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT',
         allowNull: false,
@@ -37,6 +23,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    queryInterface.dropTable('materials');
+    queryInterface.dropTable('concrete_designs');
   },
 };

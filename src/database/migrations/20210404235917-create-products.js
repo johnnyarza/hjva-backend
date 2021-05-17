@@ -13,7 +13,7 @@ module.exports = {
         type: DataTypes.UUID,
         references: { model: 'categories', key: 'id' },
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onDelete: 'RESTRICT',
         allowNull: false,
       },
       description: { type: DataTypes.STRING, allowNull: true },

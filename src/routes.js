@@ -14,6 +14,7 @@ import AvatarFileController from './app/controllers/AvatarFileController';
 import CLientController from './app/controllers/ClientController';
 import ProviderController from './app/controllers/ProviderController';
 import MaterialController from './app/controllers/MaterialController';
+import MeasureController from './app/controllers/MeasureController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -43,6 +44,7 @@ routes.post('/category', CategoryController.store);
 routes.get('/categories', CategoryController.index);
 routes.get('/category/byname', CategoryController.findByName);
 routes.delete('/category/:id', CategoryController.delete);
+routes.put('/category/:id', CategoryController.update);
 
 routes.post('/product', ProductController.store);
 routes.put('/product/:id', ProductController.update);
@@ -70,5 +72,10 @@ routes.post('/material', MaterialController.store);
 routes.get('/materials', MaterialController.index);
 routes.put('/material/:id', MaterialController.update);
 routes.delete('/material/:id', MaterialController.delete);
+
+routes.post('/measure', MeasureController.store);
+routes.get('/measurements', MeasureController.index);
+routes.put('/measure/:id', MeasureController.update);
+routes.delete('/measure/:id', MeasureController.delete);
 
 export default routes;

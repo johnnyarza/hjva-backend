@@ -7,7 +7,6 @@ class Material extends Model {
       {
         name: Sequelize.STRING,
         notes: Sequelize.STRING,
-        provider_id: Sequelize.UUID,
       },
       {
         hooks: {
@@ -25,6 +24,14 @@ class Material extends Model {
     this.belongsTo(models.Provider, {
       foreignKey: 'provider_id',
       as: 'provider',
+    });
+    this.belongsTo(models.Category, {
+      foreignKey: 'category_id',
+      as: 'category',
+    });
+    this.belongsTo(models.Measure, {
+      foreignKey: 'measurement_id',
+      as: 'measurement',
     });
   }
 }
