@@ -15,6 +15,7 @@ class MaterialController {
         measurementId: Yup.string().required(),
         notes: Yup.string(),
       });
+      console.log(req.body);
 
       if (!(await schema.isValid(req.body))) {
         return res.status(400).json({ message: 'Erro de validação' });
@@ -110,6 +111,7 @@ class MaterialController {
         categoryId: Yup.string(),
         providerId: Yup.string(),
         notes: Yup.string(),
+        measurementId: Yup.string(),
       });
 
       if (!id) {
@@ -132,7 +134,11 @@ class MaterialController {
           .json({ message: 'User does not have enough privileges' });
       }
 
-      const { providerId: provider_id, categoryId: category_id } = req.body;
+      const {
+        providerId: provider_id,
+        categoryId: category_id,
+        measurementId: measurement_id,
+      } = req.body;
 
       if (provider_id) {
         const provider = await Provider.findByPk(req.body.providerId);
@@ -150,6 +156,14 @@ class MaterialController {
         req.body.category_id = category_id;
       }
 
+      if (measurement_id) {
+        const measure = await Measure.findByPk(req.body.measurementId);
+        if (!measure) {
+          return res.status(404).json({ message: 'Measure not found' });
+        }
+        req.body.measurement_id = measurement_id;
+      }
+
       await Material.update(req.body, { where: { id } });
 
       const material = await Material.findByPk(id, {
@@ -162,6 +176,10 @@ class MaterialController {
           {
             model: Category,
             as: 'category',
+          },
+          {
+            model: Measure,
+            as: 'measurement',
           },
         ],
       });

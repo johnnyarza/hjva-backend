@@ -10,10 +10,14 @@ import Client from './models/Client';
 import Provider from './models/Provider';
 import Material from './models/Material';
 import Measure from './models/Measure';
+import ConcreteDesign from './models/ConcreteDesign';
+import ConcreteDesignMaterial from './models/ConcreteDesignMaterial';
 
 import config from '../config/database';
 
 const models = [
+  ConcreteDesignMaterial,
+  ConcreteDesign,
   Client,
   User,
   Product,

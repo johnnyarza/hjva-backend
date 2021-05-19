@@ -15,6 +15,8 @@ import CLientController from './app/controllers/ClientController';
 import ProviderController from './app/controllers/ProviderController';
 import MaterialController from './app/controllers/MaterialController';
 import MeasureController from './app/controllers/MeasureController';
+import ConcreteDesignMaterialController from './app/controllers/ConcreteDesignMaterialController';
+import ConcreteDesignController from './app/controllers/ConcreteDesignController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -77,5 +79,15 @@ routes.post('/measure', MeasureController.store);
 routes.get('/measurements', MeasureController.index);
 routes.put('/measure/:id', MeasureController.update);
 routes.delete('/measure/:id', MeasureController.delete);
+
+routes.post('/concreteDesignMaterial', ConcreteDesignMaterialController.store);
+routes.get('/concreteDesignMaterials', ConcreteDesignMaterialController.index);
+routes.delete(
+  '/concreteDesignMaterial/:id',
+  ConcreteDesignMaterialController.delete
+);
+
+routes.post('/concreteDesign', ConcreteDesignController.store);
+routes.get('/concreteDesigns', ConcreteDesignController.index);
 
 export default routes;
