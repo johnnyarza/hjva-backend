@@ -83,14 +83,17 @@ class MaterialController {
           {
             model: Provider,
             as: 'provider',
+            attributes: ['id', 'name', 'email', 'address', 'phone', 'notes'],
           },
           {
             model: Category,
             as: 'category',
+            attributes: ['id', 'name'],
           },
           {
             model: Measure,
             as: 'measurement',
+            attributes: ['id', 'abbreviation'],
           },
         ],
       });

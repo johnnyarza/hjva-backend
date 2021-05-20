@@ -3,6 +3,7 @@ import * as Yup from 'yup';
 import ConcreteDesign from '../../database/models/ConcreteDesign';
 import ConcreteDesignMaterial from '../../database/models/ConcreteDesignMaterial';
 import Material from '../../database/models/Material';
+import Measure from '../../database/models/Measure';
 
 class ConcreteDesignController {
   async store(req, res, next) {
@@ -71,7 +72,21 @@ class ConcreteDesignController {
           {
             model: ConcreteDesignMaterial,
             as: 'concreteDesignMaterial',
-            include: [{ model: Material, as: 'material' }],
+            attributes: ['id', 'quantity_per_m3'],
+            include: [
+              {
+                model: Material,
+                as: 'material',
+                attributes: ['id', 'name'],
+                include: [
+                  {
+                    model: Measure,
+                    as: 'measurement',
+                    attributes: ['id', 'abbreviation'],
+                  },
+                ],
+              },
+            ],
           },
         ],
       });
