@@ -11,11 +11,15 @@ import Provider from './models/Provider';
 import Material from './models/Material';
 import Measure from './models/Measure';
 import ConcreteDesign from './models/ConcreteDesign';
+import CompressionTest from './models/CompressionTest';
+import ConcreteSample from './models/ConcreteSample';
 import ConcreteDesignMaterial from './models/ConcreteDesignMaterial';
 
 import config from '../config/database';
 
 const models = [
+  ConcreteSample,
+  CompressionTest,
   ConcreteDesignMaterial,
   ConcreteDesign,
   Client,

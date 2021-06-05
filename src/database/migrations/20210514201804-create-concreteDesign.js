@@ -12,7 +12,6 @@ module.exports = {
       slump: {
         type: DataTypes.DECIMAL,
         allowNull: false,
-        unique: true,
         defaultValue: 0.0,
       },
       notes: { type: DataTypes.STRING, allowNull: true },

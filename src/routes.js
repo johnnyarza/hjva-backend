@@ -17,6 +17,8 @@ import MaterialController from './app/controllers/MaterialController';
 import MeasureController from './app/controllers/MeasureController';
 import ConcreteDesignMaterialController from './app/controllers/ConcreteDesignMaterialController';
 import ConcreteDesignController from './app/controllers/ConcreteDesignController';
+import CompressionTestController from './app/controllers/CompressionTestController';
+import ConcreteSampleController from './app/controllers/ConcreteSampleController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -81,6 +83,7 @@ routes.put('/measure/:id', MeasureController.update);
 routes.delete('/measure/:id', MeasureController.delete);
 
 routes.post('/concreteDesignMaterial', ConcreteDesignMaterialController.store);
+routes.put('/concreteDesignMaterial/', ConcreteDesignMaterialController.update);
 routes.get('/concreteDesignMaterials', ConcreteDesignMaterialController.index);
 routes.delete(
   '/concreteDesignMaterial/:id',
@@ -88,6 +91,17 @@ routes.delete(
 );
 
 routes.post('/concreteDesign', ConcreteDesignController.store);
+routes.put('/concreteDesign/:id', ConcreteDesignController.update);
+routes.delete('/concreteDesign/:id', ConcreteDesignController.delete);
 routes.get('/concreteDesigns', ConcreteDesignController.index);
 
+routes.post('/compressionTest', CompressionTestController.store);
+routes.put('/compressionTest/:id', CompressionTestController.update);
+routes.delete('/compressionTest/:id', CompressionTestController.delete);
+routes.get('/compressionTests', CompressionTestController.index);
+
+routes.post('/concreteSample', ConcreteSampleController.store);
+routes.put('/concreteSample/:id', ConcreteSampleController.update);
+routes.delete('/concreteSample/:id', ConcreteSampleController.delete);
+routes.get('/concreteSamples', ConcreteSampleController.index);
 export default routes;
