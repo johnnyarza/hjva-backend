@@ -52,7 +52,14 @@ class MaterialController {
       });
 
       material = await Material.findByPk(material.id, {
-        attributes: ['id', 'name', 'notes', 'created_at', 'updated_at'],
+        attributes: [
+          'id',
+          'name',
+          'notes',
+          'stockQty',
+          'created_at',
+          'updated_at',
+        ],
         include: [
           {
             model: Provider,
@@ -78,7 +85,14 @@ class MaterialController {
   async index(req, res, next) {
     try {
       const materials = await Material.findAll({
-        attributes: ['id', 'name', 'notes', 'created_at', 'updated_at'],
+        attributes: [
+          'id',
+          'name',
+          'notes',
+          'stockQty',
+          'created_at',
+          'updated_at',
+        ],
         include: [
           {
             model: Provider,

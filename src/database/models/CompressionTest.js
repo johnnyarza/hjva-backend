@@ -6,6 +6,9 @@ class CompressionTest extends Model {
     super.init(
       {
         notes: Sequelize.STRING,
+        hasWarning: {
+          type: Sequelize.VIRTUAL,
+        },
       },
       {
         hooks: {

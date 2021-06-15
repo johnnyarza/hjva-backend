@@ -1,8 +1,12 @@
+import { Op } from 'sequelize';
 import * as Yup from 'yup';
+import { startOfDay } from 'date-fns';
+
 import Client from '../../database/models/Client';
 import CompressionTest from '../../database/models/CompressionTest';
 import ConcreteDesign from '../../database/models/ConcreteDesign';
 import ConcreteDesignMaterial from '../../database/models/ConcreteDesignMaterial';
+import ConcreteSample from '../../database/models/ConcreteSample';
 import Material from '../../database/models/Material';
 
 class CompressionTestController {
@@ -97,6 +101,7 @@ class CompressionTestController {
 
   async index(req, res, next) {
     try {
+      const { locale } = req.headers || 'pt-BR';
       const compressionTests = await CompressionTest.findAll({
         attributes: ['id', 'notes', 'tracker', 'updatedAt'],
         include: [
@@ -131,7 +136,25 @@ class CompressionTestController {
           },
         ],
       });
-      return res.json(compressionTests);
+
+      const result = await Promise.all(
+        compressionTests.map(async (compressionTest) => {
+          const hasWarning = await ConcreteSample.findOne({
+            where: {
+              compression_test_id: compressionTest.id,
+              load: 0,
+              loadedAt: {
+                [Op.lt]: startOfDay(new Date()),
+              },
+            },
+          });
+
+          compressionTest.hasWarning = !!hasWarning;
+
+          return compressionTest;
+        })
+      );
+      return res.json(result);
     } catch (error) {
       return next(error);
     }
@@ -202,7 +225,7 @@ class CompressionTestController {
       await transaction.commit();
 
       const compressionTest = await CompressionTest.findByPk(id, {
-        attributes: ['id', 'notes', 'updatedAt'],
+        attributes: ['id', 'tracker', 'notes', 'updatedAt'],
         include: [
           {
             model: Client,
@@ -235,6 +258,19 @@ class CompressionTestController {
           },
         ],
       });
+
+      if (compressionTest) {
+        const hasWarning = await ConcreteSample.findOne({
+          where: {
+            compression_test_id: compressionTest.id,
+            load: 0,
+            loadedAt: {
+              [Op.lt]: startOfDay(new Date()),
+            },
+          },
+        });
+        compressionTest.hasWarning = !!hasWarning;
+      }
 
       return res.json(compressionTest);
     } catch (error) {

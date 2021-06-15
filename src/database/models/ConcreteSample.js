@@ -28,7 +28,7 @@ class ConcreteSample extends Model {
           },
           afterFind: (c, _) => {
             if (c) {
-              c.days = differenceInDays(new Date(), c.sampled_at);
+              c.days = differenceInDays(new Date(), c.sampledAt);
             }
           },
         },

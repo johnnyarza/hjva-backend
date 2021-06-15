@@ -19,6 +19,7 @@ import ConcreteDesignMaterialController from './app/controllers/ConcreteDesignMa
 import ConcreteDesignController from './app/controllers/ConcreteDesignController';
 import CompressionTestController from './app/controllers/CompressionTestController';
 import ConcreteSampleController from './app/controllers/ConcreteSampleController';
+import MaterialTransactionController from './app/controllers/MaterialTransactionController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -104,4 +105,10 @@ routes.post('/concreteSample', ConcreteSampleController.store);
 routes.put('/concreteSample/:id', ConcreteSampleController.update);
 routes.delete('/concreteSample/:id', ConcreteSampleController.delete);
 routes.get('/concreteSamples', ConcreteSampleController.index);
+
+routes.post('/materialTransaction', MaterialTransactionController.store);
+routes.get('/materialTransactions', MaterialTransactionController.index);
+routes.delete('/materialTransaction/:id', MaterialTransactionController.delete);
+routes.put('/materialTransaction/:id', MaterialTransactionController.update);
+
 export default routes;

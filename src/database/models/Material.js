@@ -7,6 +7,10 @@ class Material extends Model {
       {
         name: Sequelize.STRING,
         notes: Sequelize.STRING,
+        stockQty: {
+          type: Sequelize.DECIMAL,
+          field: 'stock_qty',
+        },
       },
       {
         hooks: {

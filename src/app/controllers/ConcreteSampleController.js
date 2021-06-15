@@ -128,7 +128,7 @@ class ConcreteSampleController {
         : {};
       const options = {
         ...whereOption,
-        order: [['sampled_at', 'ASC']],
+        order: [['tracker', 'ASC']],
         include: [
           {
             model: CompressionTest,
@@ -153,19 +153,10 @@ class ConcreteSampleController {
             ],
           },
         ],
-        attributes: [
-          'id',
-          'tracker',
-          'load',
-          'weight',
-          'height',
-          'diameter',
-          'slump',
-          'notes',
-          'sampledAt',
-          'loadedAt',
-          'updatedAt',
-        ],
+        attributes: {
+          exclude: ['compression_test_id', 'concrete_design_id'],
+          include: ['tracker'],
+        },
       };
 
       const concreteSamples = await ConcreteSample.findAll(options);
@@ -222,7 +213,6 @@ class ConcreteSampleController {
       }
 
       const concreteSampleExists = await ConcreteSample.findByPk(id);
-      console.log(concreteSampleExists);
 
       if (!concreteSampleExists) {
         return res.status(404).json({ message: 'Concrete sample not found' });
@@ -258,8 +248,8 @@ class ConcreteSampleController {
         diameter,
         slump,
         notes,
-        sampledAt: sampled_at,
-        loadedAt: loaded_at,
+        sampledAt,
+        loadedAt,
       } = req.body;
 
       await ConcreteSample.update(
@@ -270,13 +260,14 @@ class ConcreteSampleController {
           diameter,
           slump,
           notes,
-          sampled_at,
-          loaded_at,
+          sampledAt,
+          loadedAt,
           compression_test_id,
           concrete_design_id,
         },
         { where: { id } }
       );
+      console.trace(sampledAt);
 
       const updatedConcreteSample = await ConcreteSample.findByPk(id, {
         include: [
@@ -312,8 +303,8 @@ class ConcreteSampleController {
           'diameter',
           'slump',
           'notes',
-          'sampled_at',
-          'loaded_at',
+          'sampledAt',
+          'loadedAt',
           'updatedAt',
         ],
       });
