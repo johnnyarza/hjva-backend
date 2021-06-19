@@ -1,5 +1,6 @@
 import Sequelize, { Model } from 'sequelize';
 import { v4 as uuid } from 'uuid';
+import User from './User';
 
 class MaterialTransaction extends Model {
   static init(sequelize) {

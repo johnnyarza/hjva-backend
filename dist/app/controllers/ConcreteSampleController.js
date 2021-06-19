@@ -1,12 +1,14 @@
-import * as Yup from 'yup';
-import Client from '../../database/models/Client';
-import CompressionTest from '../../database/models/CompressionTest';
-import ConcreteDesign from '../../database/models/ConcreteDesign';
-import ConcreteSample from '../../database/models/ConcreteSample';
+"use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { newObj[key] = obj[key]; } } } newObj.default = obj; return newObj; } } function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _yup = require('yup'); var Yup = _interopRequireWildcard(_yup);
+var _Client = require('../../database/models/Client'); var _Client2 = _interopRequireDefault(_Client);
+var _CompressionTest = require('../../database/models/CompressionTest'); var _CompressionTest2 = _interopRequireDefault(_CompressionTest);
+var _ConcreteDesign = require('../../database/models/ConcreteDesign'); var _ConcreteDesign2 = _interopRequireDefault(_ConcreteDesign);
+var _ConcreteDesignMaterial = require('../../database/models/ConcreteDesignMaterial'); var _ConcreteDesignMaterial2 = _interopRequireDefault(_ConcreteDesignMaterial);
+var _ConcreteSample = require('../../database/models/ConcreteSample'); var _ConcreteSample2 = _interopRequireDefault(_ConcreteSample);
+var _Material = require('../../database/models/Material'); var _Material2 = _interopRequireDefault(_Material);
 
 class ConcreteSampleController {
   async store(req, res, next) {
-    const transaction = await ConcreteSample.sequelize.transaction();
+    const transaction = await _ConcreteSample2.default.sequelize.transaction();
     try {
       const schema = Yup.object().shape({
         compressionTestId: Yup.string().required(),
@@ -56,7 +58,7 @@ class ConcreteSampleController {
         };
       });
 
-      const rawConcreteSamples = await ConcreteSample.bulkCreate(
+      const rawConcreteSamples = await _ConcreteSample2.default.bulkCreate(
         concreteSamplesBody,
         {
           individualHooks: true,
@@ -68,26 +70,26 @@ class ConcreteSampleController {
 
       const concreteSamples = await Promise.all(
         rawConcreteSamples.map(({ id }) =>
-          ConcreteSample.findOne({
+          _ConcreteSample2.default.findOne({
             where: { id },
             include: [
               {
-                model: CompressionTest,
+                model: _CompressionTest2.default,
                 as: 'compressionTest',
                 attributes: ['id', 'tracker'],
                 include: [
                   {
-                    model: Client,
+                    model: _Client2.default,
                     as: 'client',
                     attributes: ['id', 'name'],
                   },
                   {
-                    model: Client,
+                    model: _Client2.default,
                     as: 'concreteProvider',
                     attributes: ['id', 'name'],
                   },
                   {
-                    model: ConcreteDesign,
+                    model: _ConcreteDesign2.default,
                     as: 'concreteDesign',
                     attributes: ['id', 'name', 'slump', 'notes'],
                   },
@@ -129,22 +131,22 @@ class ConcreteSampleController {
         order: [['tracker', 'ASC']],
         include: [
           {
-            model: CompressionTest,
+            model: _CompressionTest2.default,
             as: 'compressionTest',
             attributes: ['id', 'tracker'],
             include: [
               {
-                model: Client,
+                model: _Client2.default,
                 as: 'client',
                 attributes: ['id', 'name'],
               },
               {
-                model: Client,
+                model: _Client2.default,
                 as: 'concreteProvider',
                 attributes: ['id', 'name'],
               },
               {
-                model: ConcreteDesign,
+                model: _ConcreteDesign2.default,
                 as: 'concreteDesign',
                 attributes: ['id', 'name', 'slump', 'notes'],
               },
@@ -157,7 +159,7 @@ class ConcreteSampleController {
         },
       };
 
-      const concreteSamples = await ConcreteSample.findAll(options);
+      const concreteSamples = await _ConcreteSample2.default.findAll(options);
 
       concreteSamples.forEach((row) => {
         const { days } = row;
@@ -178,7 +180,7 @@ class ConcreteSampleController {
         return res.status(400).json({ message: 'Concrete Sample id empty' });
       }
 
-      const affectedRows = await ConcreteSample.destroy({ where: { id } });
+      const affectedRows = await _ConcreteSample2.default.destroy({ where: { id } });
 
       return res.json(affectedRows);
     } catch (error) {
@@ -210,7 +212,7 @@ class ConcreteSampleController {
         return res.status(400).json({ message: 'Concrete sample id is empty' });
       }
 
-      const concreteSampleExists = await ConcreteSample.findByPk(id);
+      const concreteSampleExists = await _ConcreteSample2.default.findByPk(id);
 
       if (!concreteSampleExists) {
         return res.status(404).json({ message: 'Concrete sample not found' });
@@ -221,7 +223,7 @@ class ConcreteSampleController {
       } = req.body;
 
       if (compression_test_id) {
-        const compressionTestExists = await CompressionTest.findByPk(
+        const compressionTestExists = await _CompressionTest2.default.findByPk(
           compression_test_id
         );
         if (!compressionTestExists) {
@@ -231,7 +233,7 @@ class ConcreteSampleController {
         }
       }
       if (concrete_design_id) {
-        const compressionTestExists = await ConcreteDesign.findByPk(
+        const compressionTestExists = await _ConcreteDesign2.default.findByPk(
           concrete_design_id
         );
         if (!compressionTestExists) {
@@ -250,7 +252,7 @@ class ConcreteSampleController {
         loadedAt,
       } = req.body;
 
-      await ConcreteSample.update(
+      await _ConcreteSample2.default.update(
         {
           load,
           weight,
@@ -265,41 +267,46 @@ class ConcreteSampleController {
         },
         { where: { id } }
       );
+      console.trace(sampledAt);
 
-      const updatedConcreteSample = await ConcreteSample.findByPk(id, {
+      const updatedConcreteSample = await _ConcreteSample2.default.findByPk(id, {
         include: [
           {
-            model: CompressionTest,
+            model: _CompressionTest2.default,
             as: 'compressionTest',
             attributes: ['id', 'tracker'],
             include: [
               {
-                model: Client,
+                model: _Client2.default,
                 as: 'client',
                 attributes: ['id', 'name'],
               },
               {
-                model: Client,
+                model: _Client2.default,
                 as: 'concreteProvider',
                 attributes: ['id', 'name'],
               },
               {
-                model: ConcreteDesign,
+                model: _ConcreteDesign2.default,
                 as: 'concreteDesign',
                 attributes: ['id', 'name', 'slump', 'notes'],
               },
             ],
           },
         ],
-        attributes: {
-          exclude: [
-            'createdAt',
-            'updatedAt',
-            'compression_test_id',
-            'concrete_design_id',
-          ],
-          include: ['tracker'],
-        },
+        attributes: [
+          'id',
+          'tracker',
+          'load',
+          'weight',
+          'height',
+          'diameter',
+          'slump',
+          'notes',
+          'sampledAt',
+          'loadedAt',
+          'updatedAt',
+        ],
       });
 
       return res.json(updatedConcreteSample);
@@ -309,4 +316,4 @@ class ConcreteSampleController {
   }
 }
 
-export default new ConcreteSampleController();
+exports. default = new ConcreteSampleController();

@@ -1,17 +1,17 @@
-import { Op } from 'sequelize';
-import * as Yup from 'yup';
-import { startOfDay } from 'date-fns';
+"use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { newObj[key] = obj[key]; } } } newObj.default = obj; return newObj; } } function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _sequelize = require('sequelize');
+var _yup = require('yup'); var Yup = _interopRequireWildcard(_yup);
+var _datefns = require('date-fns');
 
-import Client from '../../database/models/Client';
-import CompressionTest from '../../database/models/CompressionTest';
-import ConcreteDesign from '../../database/models/ConcreteDesign';
-import ConcreteDesignMaterial from '../../database/models/ConcreteDesignMaterial';
-import ConcreteSample from '../../database/models/ConcreteSample';
-import Material from '../../database/models/Material';
+var _Client = require('../../database/models/Client'); var _Client2 = _interopRequireDefault(_Client);
+var _CompressionTest = require('../../database/models/CompressionTest'); var _CompressionTest2 = _interopRequireDefault(_CompressionTest);
+var _ConcreteDesign = require('../../database/models/ConcreteDesign'); var _ConcreteDesign2 = _interopRequireDefault(_ConcreteDesign);
+var _ConcreteDesignMaterial = require('../../database/models/ConcreteDesignMaterial'); var _ConcreteDesignMaterial2 = _interopRequireDefault(_ConcreteDesignMaterial);
+var _ConcreteSample = require('../../database/models/ConcreteSample'); var _ConcreteSample2 = _interopRequireDefault(_ConcreteSample);
+var _Material = require('../../database/models/Material'); var _Material2 = _interopRequireDefault(_Material);
 
 class CompressionTestController {
   async store(req, res, next) {
-    const transaction = await CompressionTest.sequelize.transaction();
+    const transaction = await _CompressionTest2.default.sequelize.transaction();
     try {
       const schema = Yup.object().shape({
         concreteDesignId: Yup.string().required(),
@@ -31,7 +31,7 @@ class CompressionTestController {
         notes,
       } = req.body;
 
-      const concreteDesignExists = await ConcreteDesign.findByPk(
+      const concreteDesignExists = await _ConcreteDesign2.default.findByPk(
         concrete_design_id
       );
 
@@ -39,8 +39,8 @@ class CompressionTestController {
         return res.status(404).json({ message: 'Concrete Design not found' });
       }
 
-      const clientExists = await Client.findByPk(client_id);
-      const concreteProviderExists = await Client.findByPk(
+      const clientExists = await _Client2.default.findByPk(client_id);
+      const concreteProviderExists = await _Client2.default.findByPk(
         concrete_provider_id
       );
 
@@ -48,7 +48,7 @@ class CompressionTestController {
         return res.status(404).json({ message: 'Client not found' });
       }
 
-      const { id } = await CompressionTest.create(
+      const { id } = await _CompressionTest2.default.create(
         {
           concrete_design_id,
           client_id,
@@ -58,31 +58,31 @@ class CompressionTestController {
         { transaction }
       );
       await transaction.commit();
-      const compressionTest = await CompressionTest.findByPk(id, {
+      const compressionTest = await _CompressionTest2.default.findByPk(id, {
         attributes: ['id', 'tracker', 'notes', 'updatedAt'],
         include: [
           {
-            model: Client,
+            model: _Client2.default,
             as: 'client',
             attributes: ['id', 'name'],
           },
           {
-            model: Client,
+            model: _Client2.default,
             as: 'concreteProvider',
             attributes: ['id', 'name'],
           },
           {
-            model: ConcreteDesign,
+            model: _ConcreteDesign2.default,
             as: 'concreteDesign',
             attributes: ['id', 'name', 'slump', 'notes'],
             include: [
               {
-                model: ConcreteDesignMaterial,
+                model: _ConcreteDesignMaterial2.default,
                 as: 'concreteDesignMaterial',
                 attributes: ['quantity_per_m3'],
                 include: [
                   {
-                    model: Material,
+                    model: _Material2.default,
                     as: 'material',
                     attributes: ['id', 'name'],
                   },
@@ -101,34 +101,32 @@ class CompressionTestController {
 
   async index(req, res, next) {
     try {
-      const { id } = req.query;
-      const whereOption = id ? { where: { id } } : {};
-      const compressionTests = await CompressionTest.findAll({
-        ...whereOption,
+      const { locale } = req.headers || 'pt-BR';
+      const compressionTests = await _CompressionTest2.default.findAll({
         attributes: ['id', 'notes', 'tracker', 'updatedAt'],
         include: [
           {
-            model: Client,
+            model: _Client2.default,
             as: 'client',
             attributes: ['id', 'name'],
           },
           {
-            model: Client,
+            model: _Client2.default,
             as: 'concreteProvider',
             attributes: ['id', 'name'],
           },
           {
-            model: ConcreteDesign,
+            model: _ConcreteDesign2.default,
             as: 'concreteDesign',
             attributes: ['id', 'name', 'slump', 'notes'],
             include: [
               {
-                model: ConcreteDesignMaterial,
+                model: _ConcreteDesignMaterial2.default,
                 as: 'concreteDesignMaterial',
                 attributes: ['quantity_per_m3'],
                 include: [
                   {
-                    model: Material,
+                    model: _Material2.default,
                     as: 'material',
                     attributes: ['id', 'name'],
                   },
@@ -141,12 +139,12 @@ class CompressionTestController {
 
       const result = await Promise.all(
         compressionTests.map(async (compressionTest) => {
-          const hasWarning = await ConcreteSample.findOne({
+          const hasWarning = await _ConcreteSample2.default.findOne({
             where: {
               compression_test_id: compressionTest.id,
               load: 0,
               loadedAt: {
-                [Op.lt]: startOfDay(new Date()),
+                [_sequelize.Op.lt]: _datefns.startOfDay.call(void 0, new Date()),
               },
             },
           });
@@ -163,7 +161,7 @@ class CompressionTestController {
   }
 
   async update(req, res, next) {
-    const transaction = await CompressionTest.sequelize.transaction();
+    const transaction = await _CompressionTest2.default.sequelize.transaction();
     try {
       const { id } = req.params;
       const schema = Yup.object().shape({
@@ -189,7 +187,7 @@ class CompressionTestController {
       } = req.body;
 
       if (concrete_design_id) {
-        const concreteDesignExists = await ConcreteDesign.findByPk(
+        const concreteDesignExists = await _ConcreteDesign2.default.findByPk(
           concrete_design_id
         );
 
@@ -199,14 +197,14 @@ class CompressionTestController {
       }
 
       if (client_id) {
-        const clientExists = await Client.findByPk(client_id);
+        const clientExists = await _Client2.default.findByPk(client_id);
 
         if (!clientExists) {
           return res.status(404).json({ message: 'Client not found' });
         }
       }
       if (concrete_provider_id) {
-        const providerExists = await Client.findByPk(concrete_provider_id);
+        const providerExists = await _Client2.default.findByPk(concrete_provider_id);
 
         if (!providerExists) {
           return res
@@ -215,7 +213,7 @@ class CompressionTestController {
         }
       }
 
-      await CompressionTest.update(
+      await _CompressionTest2.default.update(
         {
           concrete_design_id,
           client_id,
@@ -226,31 +224,31 @@ class CompressionTestController {
 
       await transaction.commit();
 
-      const compressionTest = await CompressionTest.findByPk(id, {
+      const compressionTest = await _CompressionTest2.default.findByPk(id, {
         attributes: ['id', 'tracker', 'notes', 'updatedAt'],
         include: [
           {
-            model: Client,
+            model: _Client2.default,
             as: 'client',
             attributes: ['id', 'name'],
           },
           {
-            model: Client,
+            model: _Client2.default,
             as: 'concreteProvider',
             attributes: ['id', 'name'],
           },
           {
-            model: ConcreteDesign,
+            model: _ConcreteDesign2.default,
             as: 'concreteDesign',
             attributes: ['id', 'name', 'slump', 'notes'],
             include: [
               {
-                model: ConcreteDesignMaterial,
+                model: _ConcreteDesignMaterial2.default,
                 as: 'concreteDesignMaterial',
                 attributes: ['quantity_per_m3'],
                 include: [
                   {
-                    model: Material,
+                    model: _Material2.default,
                     as: 'material',
                     attributes: ['id', 'name'],
                   },
@@ -262,12 +260,12 @@ class CompressionTestController {
       });
 
       if (compressionTest) {
-        const hasWarning = await ConcreteSample.findOne({
+        const hasWarning = await _ConcreteSample2.default.findOne({
           where: {
             compression_test_id: compressionTest.id,
             load: 0,
             loadedAt: {
-              [Op.lt]: startOfDay(new Date()),
+              [_sequelize.Op.lt]: _datefns.startOfDay.call(void 0, new Date()),
             },
           },
         });
@@ -282,13 +280,13 @@ class CompressionTestController {
   }
 
   async delete(req, res, next) {
-    const transaction = await CompressionTest.sequelize.transaction();
+    const transaction = await _CompressionTest2.default.sequelize.transaction();
     try {
       const { id } = req.params;
       if (!id) {
         return res.status(400).json({ message: 'Concrete Design id is empty' });
       }
-      const affectedRows = await CompressionTest.destroy({
+      const affectedRows = await _CompressionTest2.default.destroy({
         where: { id },
         transaction,
       });
@@ -301,4 +299,4 @@ class CompressionTestController {
   }
 }
 
-export default new CompressionTestController();
+exports. default = new CompressionTestController();

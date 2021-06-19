@@ -12,6 +12,21 @@ class ConcreteSample extends Model {
         diameter: Sequelize.DECIMAL(10, 3),
         slump: Sequelize.DECIMAL(10, 3),
         notes: Sequelize.STRING,
+        mPa: {
+          type: Sequelize.VIRTUAL,
+          get() {
+            const load = this.getDataValue('load');
+            const diameter = this.getDataValue('diameter');
+            if (load && diameter) {
+              const areaM2 =
+                (Math.PI * (diameter * diameter)) / 4 / (100 * 100);
+              const loadNewton = load * 9806.65;
+              const megaNewton = loadNewton / areaM2 / 1000000;
+              return megaNewton;
+            }
+            return 0;
+          },
+        },
         days: {
           type: Sequelize.VIRTUAL,
           get() {

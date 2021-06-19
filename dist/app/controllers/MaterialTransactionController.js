@@ -1,11 +1,11 @@
-import * as Yup from 'yup';
-import Category from '../../database/models/Category';
-import Client from '../../database/models/Client';
-import Material from '../../database/models/Material';
-import MaterialTransaction from '../../database/models/MaterialTransaction';
-import Measure from '../../database/models/Measure';
-import Provider from '../../database/models/Provider';
-import User from '../../database/models/User';
+"use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { newObj[key] = obj[key]; } } } newObj.default = obj; return newObj; } } function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _yup = require('yup'); var Yup = _interopRequireWildcard(_yup);
+var _Category = require('../../database/models/Category'); var _Category2 = _interopRequireDefault(_Category);
+var _Client = require('../../database/models/Client'); var _Client2 = _interopRequireDefault(_Client);
+var _Material = require('../../database/models/Material'); var _Material2 = _interopRequireDefault(_Material);
+var _MaterialTransaction = require('../../database/models/MaterialTransaction'); var _MaterialTransaction2 = _interopRequireDefault(_MaterialTransaction);
+var _Measure = require('../../database/models/Measure'); var _Measure2 = _interopRequireDefault(_Measure);
+var _Provider = require('../../database/models/Provider'); var _Provider2 = _interopRequireDefault(_Provider);
+var _User = require('../../database/models/User'); var _User2 = _interopRequireDefault(_User);
 
 const checkIfObjectsExists = async (
   materialId = '',
@@ -16,15 +16,15 @@ const checkIfObjectsExists = async (
 
   const res = { exists: true };
   if (materialId) {
-    const material = await Material.findByPk(materialId);
+    const material = await _Material2.default.findByPk(materialId);
     if (!material) return { model: 'material', exists: false };
   }
   if (clientId) {
-    const client = await Client.findByPk(clientId);
+    const client = await _Client2.default.findByPk(clientId);
     if (!client) return { model: 'client', exists: false };
   }
   if (providerId) {
-    const provider = await Provider.findByPk(providerId);
+    const provider = await _Provider2.default.findByPk(providerId);
     if (!provider) return { model: 'provider', exists: false };
   }
   return res;
@@ -45,27 +45,27 @@ const findByPkDefaultOptions = {
   },
   include: [
     {
-      model: Client,
+      model: _Client2.default,
       as: 'client',
       attributes: ['id', 'name'],
     },
     {
-      model: Provider,
+      model: _Provider2.default,
       as: 'provider',
       attributes: ['id', 'name'],
     },
     {
-      model: Material,
+      model: _Material2.default,
       as: 'material',
       attributes: ['id', 'name', 'stock_qty'],
       include: [
         {
-          model: Measure,
+          model: _Measure2.default,
           as: 'measurement',
           attributes: ['abbreviation'],
         },
         {
-          model: Category,
+          model: _Category2.default,
           as: 'category',
           attributes: ['name'],
         },
@@ -76,7 +76,7 @@ const findByPkDefaultOptions = {
 
 class MaterialTransactionController {
   async store(req, res, next) {
-    const transaction = await MaterialTransaction.sequelize.transaction();
+    const transaction = await _MaterialTransaction2.default.sequelize.transaction();
     try {
       const { materialId, clientId, providerId } = req.body;
       const schema = Yup.object().shape(
@@ -123,7 +123,7 @@ class MaterialTransactionController {
         return res.status(404).json({ message: `${model} does not exist` });
       }
 
-      const material = await Material.findByPk(materialId);
+      const material = await _Material2.default.findByPk(materialId);
 
       if (!material) {
         return res.status(404).json({ message: `Material does not exist` });
@@ -131,7 +131,7 @@ class MaterialTransactionController {
 
       const { stockQty: previousQty } = material;
 
-      const { id } = await MaterialTransaction.create(
+      const { id } = await _MaterialTransaction2.default.create(
         {
           previousQty,
           ...req.body,
@@ -139,16 +139,16 @@ class MaterialTransactionController {
         transaction
       );
 
-      const sum = await MaterialTransaction.sum('entry', {
+      const sum = await _MaterialTransaction2.default.sum('entry', {
         where: { material_id: materialId },
       });
 
-      await Material.update(
+      await _Material2.default.update(
         { stockQty: sum },
         { where: { id: materialId }, transaction }
       );
       await transaction.commit();
-      const materialTransaction = await MaterialTransaction.findByPk(
+      const materialTransaction = await _MaterialTransaction2.default.findByPk(
         id,
         findByPkDefaultOptions
       );
@@ -161,7 +161,7 @@ class MaterialTransactionController {
   }
 
   async delete(req, res, next) {
-    const transaction = await MaterialTransaction.sequelize.transaction();
+    const transaction = await _MaterialTransaction2.default.sequelize.transaction();
     try {
       const { id } = req.params;
       const { userId } = req;
@@ -172,7 +172,7 @@ class MaterialTransactionController {
       if (!userId) {
         return res.status(400).json({ message: 'UserId is empty' });
       }
-      const userExists = await User.findByPk(userId);
+      const userExists = await _User2.default.findByPk(userId);
 
       if (!userExists) {
         return res.status(404).json({ message: 'User not found' });
@@ -185,7 +185,7 @@ class MaterialTransactionController {
           .json({ message: 'user does not have enough privileges' });
       }
 
-      const materialTransaction = await MaterialTransaction.findByPk(
+      const materialTransaction = await _MaterialTransaction2.default.findByPk(
         id,
         findByPkDefaultOptions
       );
@@ -193,17 +193,17 @@ class MaterialTransactionController {
       const { material } = materialTransaction;
       const { id: material_id } = material;
 
-      const affectedRows = await MaterialTransaction.destroy({
+      const affectedRows = await _MaterialTransaction2.default.destroy({
         where: { id },
         transaction,
       });
 
-      const sum = await MaterialTransaction.sum('entry', {
+      const sum = await _MaterialTransaction2.default.sum('entry', {
         where: { material_id },
         transaction,
       });
 
-      await Material.update(
+      await _Material2.default.update(
         { stockQty: sum },
         { where: { id: material_id }, transaction }
       );
@@ -218,7 +218,7 @@ class MaterialTransactionController {
 
   async index(req, res, next) {
     try {
-      const matTrans = await MaterialTransaction.findAll(
+      const matTrans = await _MaterialTransaction2.default.findAll(
         findByPkDefaultOptions
       );
       return res.json(matTrans);
@@ -228,7 +228,7 @@ class MaterialTransactionController {
   }
 
   async update(req, res, next) {
-    const transaction = await MaterialTransaction.sequelize.transaction();
+    const transaction = await _MaterialTransaction2.default.sequelize.transaction();
     try {
       const { providerId, clientId, materialId } = req.body;
       const { id } = req.params;
@@ -271,12 +271,12 @@ class MaterialTransactionController {
         return res.status(404).json({ message: `${model} does not exist` });
       }
 
-      const material = await Material.findByPk(materialId);
+      const material = await _Material2.default.findByPk(materialId);
       if (!material) {
         return res.status(404).json({ message: `Material does not exist` });
       }
 
-      const materialTransactionExists = await MaterialTransaction.findByPk(id);
+      const materialTransactionExists = await _MaterialTransaction2.default.findByPk(id);
 
       if (!materialTransactionExists) {
         return res
@@ -292,24 +292,24 @@ class MaterialTransactionController {
           .json({ message: `Informed Material is not the same` });
       }
 
-      await MaterialTransaction.update(req.body, {
+      await _MaterialTransaction2.default.update(req.body, {
         where: { id },
         transaction,
       });
 
       if (req.body.entry) {
-        const sum = await MaterialTransaction.sum('entry', {
+        const sum = await _MaterialTransaction2.default.sum('entry', {
           where: { material_id: materialId },
           transaction,
         });
-        await Material.update(
+        await _Material2.default.update(
           { stockQty: sum },
           { where: { id: materialId }, transaction }
         );
       }
       await transaction.commit();
 
-      const materialTransaction = await MaterialTransaction.findByPk(
+      const materialTransaction = await _MaterialTransaction2.default.findByPk(
         id,
         findByPkDefaultOptions
       );
@@ -322,4 +322,4 @@ class MaterialTransactionController {
   }
 }
 
-export default new MaterialTransactionController();
+exports. default = new MaterialTransactionController();
