@@ -180,6 +180,7 @@ class CompressionTestController {
       if (!id) {
         return res.status(400).json({ message: 'Concrete Design Id is empty' });
       }
+      console.log({ id, ...req.body });
 
       const {
         concreteDesignId: concrete_design_id,
@@ -219,6 +220,7 @@ class CompressionTestController {
         {
           concrete_design_id,
           client_id,
+          concrete_provider_id,
           notes,
         },
         { where: { id }, transaction }
