@@ -27,7 +27,7 @@ const upload = multer(multerConfig);
 routes.get('/', (req, res) => res.json({ message: 'Hello world' }));
 routes.post('/user', UserController.store);
 routes.post('/session', SessionController.store);
-routes.get('/product', ProductController.index);
+routes.get('/products', ProductController.index);
 routes.get('/product/:id', ProductController.findById);
 
 routes.use(auth);

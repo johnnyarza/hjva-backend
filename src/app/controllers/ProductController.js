@@ -54,7 +54,7 @@ class ProductController {
     const data = await Product.findAll({
       include: [
         { model: File, as: 'file' },
-        { model: Category, as: 'category', attributes: ['name'] },
+        { model: Category, as: 'category', attributes: ['id', 'name'] },
       ],
       order: [['name', 'ASC']],
     });
