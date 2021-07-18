@@ -4,6 +4,7 @@ import Provider from '../../database/models/Provider';
 import User from '../../database/models/User';
 import Category from '../../database/models/Category';
 import Measure from '../../database/models/Measure';
+import MaterialFile from '../../database/models/MaterialFile';
 
 class MaterialController {
   async store(req, res, next) {
@@ -108,6 +109,10 @@ class MaterialController {
             as: 'measurement',
             attributes: ['id', 'abbreviation'],
           },
+          {
+            model: MaterialFile,
+            as: 'file',
+          },
         ],
       });
       return res.json(materials);
@@ -205,6 +210,10 @@ class MaterialController {
           {
             model: Measure,
             as: 'measurement',
+          },
+          {
+            model: MaterialFile,
+            as: 'file',
           },
         ],
       });

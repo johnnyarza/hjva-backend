@@ -37,6 +37,10 @@ class Material extends Model {
       foreignKey: 'measurement_id',
       as: 'measurement',
     });
+    this.hasMany(models.MaterialFile, {
+      foreignKey: 'material_id',
+      as: 'file',
+    });
   }
 }
 

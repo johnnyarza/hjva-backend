@@ -15,6 +15,7 @@ import CompressionTest from './models/CompressionTest';
 import ConcreteSample from './models/ConcreteSample';
 import ConcreteDesignMaterial from './models/ConcreteDesignMaterial';
 import MaterialTransaction from './models/MaterialTransaction';
+import MaterialFile from './models/MaterialFile';
 
 import config from '../config/database';
 
@@ -34,6 +35,7 @@ const models = [
   Provider,
   Material,
   Measure,
+  MaterialFile,
 ];
 
 class Database {

@@ -1,8 +1,39 @@
-"use strict";Object.defineProperty(exports, "__esModule", {value: true}); function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { newObj[key] = obj[key]; } } } newObj.default = obj; return newObj; } } function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }var _yup = require('yup'); var Yup = _interopRequireWildcard(_yup);
-var _ConcreteDesign = require('../../database/models/ConcreteDesign'); var _ConcreteDesign2 = _interopRequireDefault(_ConcreteDesign);
-var _ConcreteDesignMaterial = require('../../database/models/ConcreteDesignMaterial'); var _ConcreteDesignMaterial2 = _interopRequireDefault(_ConcreteDesignMaterial);
-var _Material = require('../../database/models/Material'); var _Material2 = _interopRequireDefault(_Material);
-var _Measure = require('../../database/models/Measure'); var _Measure2 = _interopRequireDefault(_Measure);
+Object.defineProperty(exports, '__esModule', { value: true });
+function _interopRequireWildcard(obj) {
+  if (obj && obj.__esModule) {
+    return obj;
+  }
+  const newObj = {};
+  if (obj != null) {
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        newObj[key] = obj[key];
+      }
+    }
+  }
+  newObj.default = obj;
+  return newObj;
+}
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+const _yup = require('yup');
+
+const Yup = _interopRequireWildcard(_yup);
+const _ConcreteDesign = require('../../database/models/ConcreteDesign');
+
+const _ConcreteDesign2 = _interopRequireDefault(_ConcreteDesign);
+const _ConcreteDesignMaterial = require('../../database/models/ConcreteDesignMaterial');
+
+const _ConcreteDesignMaterial2 = _interopRequireDefault(
+  _ConcreteDesignMaterial
+);
+const _Material = require('../../database/models/Material');
+
+const _Material2 = _interopRequireDefault(_Material);
+const _Measure = require('../../database/models/Measure');
+
+const _Measure2 = _interopRequireDefault(_Measure);
 
 class ConcreteDesignMaterialController {
   async store(req, res, next) {
@@ -35,12 +66,14 @@ class ConcreteDesignMaterialController {
           });
         }
         // eslint-disable-next-line no-await-in-loop
-        const materialAlreadyInUse = await _ConcreteDesignMaterial2.default.findOne({
-          where: {
-            material_id,
-            concrete_design_id,
-          },
-        });
+        const materialAlreadyInUse = await _ConcreteDesignMaterial2.default.findOne(
+          {
+            where: {
+              material_id,
+              concrete_design_id,
+            },
+          }
+        );
 
         if (materialAlreadyInUse) {
           return res.status(400).json({
@@ -49,11 +82,14 @@ class ConcreteDesignMaterialController {
         }
       }
 
-      const response = await _ConcreteDesignMaterial2.default.bulkCreate(req.body, {
-        transaction,
-        individualHooks: true,
-        returning: ['id'],
-      });
+      const response = await _ConcreteDesignMaterial2.default.bulkCreate(
+        req.body,
+        {
+          transaction,
+          individualHooks: true,
+          returning: ['id'],
+        }
+      );
 
       await transaction.commit();
 
@@ -170,4 +206,4 @@ class ConcreteDesignMaterialController {
     }
   }
 }
-exports. default = new ConcreteDesignMaterialController();
+exports.default = new ConcreteDesignMaterialController();
