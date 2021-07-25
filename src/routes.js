@@ -77,6 +77,7 @@ routes.get('/providers', ProviderController.index);
 routes.post('/material', MaterialController.store);
 routes.get('/materials', MaterialController.index);
 routes.put('/material/:id', MaterialController.update);
+routes.get('/material/:id', MaterialController.findById);
 routes.delete('/material/:id', MaterialController.delete);
 routes.delete('/material/:id/file', MaterialFileController.delete);
 routes.post(

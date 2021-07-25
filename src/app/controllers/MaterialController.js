@@ -4,7 +4,7 @@ import Provider from '../../database/models/Provider';
 import User from '../../database/models/User';
 import Category from '../../database/models/Category';
 import Measure from '../../database/models/Measure';
-import MaterialFile from '../../database/models/MaterialFile';
+import File from '../../database/models/MaterialFile';
 
 class MaterialController {
   async store(req, res, next) {
@@ -110,7 +110,7 @@ class MaterialController {
             attributes: ['id', 'abbreviation'],
           },
           {
-            model: MaterialFile,
+            model: File,
             as: 'file',
           },
         ],
@@ -212,7 +212,68 @@ class MaterialController {
             as: 'measurement',
           },
           {
-            model: MaterialFile,
+            model: File,
+            as: 'file',
+          },
+        ],
+      });
+      await transaction.commit();
+
+      return res.json(material);
+    } catch (error) {
+      await transaction.rollback();
+      return next(error);
+    }
+  }
+
+  async findById(req, res, next) {
+    const transaction = await Material.sequelize.transaction();
+    try {
+      const { id } = req.params;
+      const { userId: requestingId } = req;
+      const requestingUser = await User.findByPk(requestingId);
+
+      if (!id) {
+        return res.status(400).json({ message: 'Product id is empty' });
+      }
+
+      if (!requestingUser) {
+        return res.status(404).json({ message: 'Requesting user not found' });
+      }
+
+      // const { role } = requestingUser;
+
+      // if (!(role === 'admin' || role === 'escritorio')) {
+      //   return res
+      //     .status(403)
+      //     .json({ message: 'User does not have enough privileges' });
+      // }
+
+      const material = await Material.findByPk(id, {
+        transaction,
+        attributes: [
+          'id',
+          'name',
+          'notes',
+          'stockQty',
+          'created_at',
+          'updated_at',
+        ],
+        include: [
+          {
+            model: Provider,
+            as: 'provider',
+          },
+          {
+            model: Category,
+            as: 'category',
+          },
+          {
+            model: Measure,
+            as: 'measurement',
+          },
+          {
+            model: File,
             as: 'file',
           },
         ],
@@ -227,6 +288,7 @@ class MaterialController {
   }
 
   async delete(req, res, next) {
+    const transaction = await Material.sequelize.transaction();
     try {
       const { id } = req.params;
       const { userId: requestingId } = req;
@@ -252,10 +314,19 @@ class MaterialController {
           .json({ message: 'User does not have enough privileges' });
       }
 
-      const affectedRows = await Material.destroy({ where: { id } });
+      const files = await File.findAll({ where: { material_id: id } });
+      await Promise.all(files.map((file) => file.destroy({ transaction })));
+
+      const affectedRows = await Material.destroy({
+        where: { id },
+        transaction,
+      });
+
+      await transaction.commit();
 
       return res.json(affectedRows);
     } catch (error) {
+      await transaction.rollback();
       return next(error);
     }
   }
