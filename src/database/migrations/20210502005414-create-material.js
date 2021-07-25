@@ -36,6 +36,12 @@ module.exports = {
         unique: false,
         defaultValue: 0.0,
       },
+      toSell: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        unique: false,
+        defaultValue: false,
+      },
       name: { type: DataTypes.STRING, allowNull: false, unique: true },
       notes: { type: DataTypes.STRING, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
