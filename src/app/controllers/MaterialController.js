@@ -15,6 +15,7 @@ class MaterialController {
         providerId: Yup.string().required(),
         measurementId: Yup.string().required(),
         notes: Yup.string(),
+        toSell: Yup.boolean(),
       });
 
       if (!(await schema.isValid(req.body))) {
@@ -41,6 +42,7 @@ class MaterialController {
         categoryId: category_id,
         measurementId: measurement_id,
         notes,
+        toSell,
       } = req.body;
 
       let material = await Material.create({
@@ -59,6 +61,7 @@ class MaterialController {
           'stockQty',
           'created_at',
           'updated_at',
+          'toSell',
         ],
         include: [
           {
@@ -90,6 +93,7 @@ class MaterialController {
           'name',
           'notes',
           'stockQty',
+          'toSell',
           'created_at',
           'updated_at',
         ],
@@ -134,6 +138,7 @@ class MaterialController {
         providerId: Yup.string(),
         notes: Yup.string(),
         measurementId: Yup.string(),
+        toSell: Yup.boolean(),
       });
 
       if (!id) {
@@ -197,6 +202,7 @@ class MaterialController {
           'stockQty',
           'created_at',
           'updated_at',
+          'toSell',
         ],
         include: [
           {
@@ -256,6 +262,7 @@ class MaterialController {
           'name',
           'notes',
           'stockQty',
+          'toSell',
           'created_at',
           'updated_at',
         ],

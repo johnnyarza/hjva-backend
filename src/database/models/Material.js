@@ -7,6 +7,7 @@ class Material extends Model {
       {
         name: Sequelize.STRING,
         notes: Sequelize.STRING,
+        toSell: { type: Sequelize.BOOLEAN, field: 'toSell' },
         stockQty: {
           type: Sequelize.DECIMAL,
           field: 'stock_qty',
