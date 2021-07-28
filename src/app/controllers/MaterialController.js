@@ -125,6 +125,47 @@ class MaterialController {
     }
   }
 
+  async findAllToSellMaterials(req, res, next) {
+    try {
+      const materials = await Material.findAll({
+        where: { toSell: true },
+        attributes: [
+          'id',
+          'name',
+          'notes',
+          'stockQty',
+          'toSell',
+          'created_at',
+          'updated_at',
+        ],
+        include: [
+          {
+            model: Provider,
+            as: 'provider',
+            attributes: ['id', 'name', 'email', 'address', 'phone', 'notes'],
+          },
+          {
+            model: Category,
+            as: 'category',
+            attributes: ['id', 'name'],
+          },
+          {
+            model: Measure,
+            as: 'measurement',
+            attributes: ['id', 'abbreviation'],
+          },
+          {
+            model: File,
+            as: 'file',
+          },
+        ],
+      });
+      return res.json(materials);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async update(req, res, next) {
     const transaction = await Material.sequelize.transaction();
     try {
