@@ -51,6 +51,7 @@ class MaterialController {
         category_id,
         measurement_id,
         notes,
+        toSell,
       });
 
       material = await Material.findByPk(material.id, {
