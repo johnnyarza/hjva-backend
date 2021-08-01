@@ -1,4 +1,4 @@
-"use strict";const { DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
       },
       name: { type: DataTypes.STRING, allowNull: false, unique: true },
-      email: { type: DataTypes.STRING, allowNull: true, unique: true },
+      email: { type: DataTypes.STRING, allowNull: true, unique: false },
       address: { type: DataTypes.STRING, allowNull: true },
       phone: { type: DataTypes.STRING, allowNull: true },
       notes: { type: DataTypes.STRING, allowNull: true },
