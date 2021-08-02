@@ -30,6 +30,7 @@ routes.post('/user', UserController.store);
 routes.post('/session', SessionController.store);
 routes.get('/products', ProductController.index);
 routes.get('/product/:id', ProductController.findById);
+routes.get('/materialsToSell', MaterialController.findAllToSellMaterials);
 
 routes.use(auth);
 
@@ -76,7 +77,6 @@ routes.get('/providers', ProviderController.index);
 
 routes.post('/material', MaterialController.store);
 routes.get('/materials', MaterialController.index);
-routes.get('/materialsToSell', MaterialController.findAllToSellMaterials);
 routes.put('/material/:id', MaterialController.update);
 routes.get('/material/:id', MaterialController.findById);
 routes.delete('/material/:id', MaterialController.delete);
