@@ -6,6 +6,39 @@ import Category from '../../database/models/Category';
 import Measure from '../../database/models/Measure';
 import File from '../../database/models/MaterialFile';
 
+const defaultFindParams = {
+  attributes: [
+    'id',
+    'name',
+    'notes',
+    'stockQty',
+    'toSell',
+    'created_at',
+    'updated_at',
+  ],
+  include: [
+    {
+      model: Provider,
+      as: 'provider',
+      attributes: ['id', 'name', 'email', 'address', 'phone', 'notes'],
+    },
+    {
+      model: Category,
+      as: 'category',
+      attributes: ['id', 'name'],
+    },
+    {
+      model: Measure,
+      as: 'measurement',
+      attributes: ['id', 'abbreviation'],
+    },
+    {
+      model: File,
+      as: 'file',
+    },
+  ],
+};
+
 class MaterialController {
   async store(req, res, next) {
     try {
@@ -88,38 +121,7 @@ class MaterialController {
 
   async index(req, res, next) {
     try {
-      const materials = await Material.findAll({
-        attributes: [
-          'id',
-          'name',
-          'notes',
-          'stockQty',
-          'toSell',
-          'created_at',
-          'updated_at',
-        ],
-        include: [
-          {
-            model: Provider,
-            as: 'provider',
-            attributes: ['id', 'name', 'email', 'address', 'phone', 'notes'],
-          },
-          {
-            model: Category,
-            as: 'category',
-            attributes: ['id', 'name'],
-          },
-          {
-            model: Measure,
-            as: 'measurement',
-            attributes: ['id', 'abbreviation'],
-          },
-          {
-            model: File,
-            as: 'file',
-          },
-        ],
-      });
+      const materials = await Material.findAll(defaultFindParams);
       return res.json(materials);
     } catch (error) {
       return next(error);
@@ -285,9 +287,9 @@ class MaterialController {
         return res.status(400).json({ message: 'Product id is empty' });
       }
 
-      if (!requestingUser) {
-        return res.status(404).json({ message: 'Requesting user not found' });
-      }
+      // if (!requestingUser) {
+      //   return res.status(404).json({ message: 'Requesting user not found' });
+      // }
 
       // const { role } = requestingUser;
 
@@ -299,33 +301,7 @@ class MaterialController {
 
       const material = await Material.findByPk(id, {
         transaction,
-        attributes: [
-          'id',
-          'name',
-          'notes',
-          'stockQty',
-          'toSell',
-          'created_at',
-          'updated_at',
-        ],
-        include: [
-          {
-            model: Provider,
-            as: 'provider',
-          },
-          {
-            model: Category,
-            as: 'category',
-          },
-          {
-            model: Measure,
-            as: 'measurement',
-          },
-          {
-            model: File,
-            as: 'file',
-          },
-        ],
+        ...defaultFindParams,
       });
       await transaction.commit();
 

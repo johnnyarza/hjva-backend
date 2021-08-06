@@ -96,6 +96,7 @@ class ProductController {
         { model: Category, as: 'category', attributes: ['name'] },
       ],
     });
+    console.table(data);
 
     const {
       id: idNew,
