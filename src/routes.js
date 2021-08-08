@@ -31,6 +31,7 @@ routes.post('/session', SessionController.store);
 routes.get('/products', ProductController.index);
 routes.get('/material/:id', MaterialController.findById);
 routes.get('/materialsToSell', MaterialController.findAllToSellMaterials);
+routes.get('/categories', CategoryController.index);
 
 routes.use(auth);
 
@@ -48,7 +49,7 @@ routes.get('/users', UserController.index);
 routes.post('/users/avatar', upload.single('file'), AvatarFileController.store);
 
 routes.post('/category', CategoryController.store);
-routes.get('/categories', CategoryController.index);
+
 routes.get('/category/byname', CategoryController.findByName);
 routes.delete('/category/:id', CategoryController.delete);
 routes.put('/category/:id', CategoryController.update);
