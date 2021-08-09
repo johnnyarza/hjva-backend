@@ -36,6 +36,12 @@ module.exports = {
         unique: false,
         defaultValue: 0.0,
       },
+      price: {
+        type: DataTypes.DECIMAL,
+        allowNull: false,
+        unique: false,
+        defaultValue: 0.0,
+      },
       toSell: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
