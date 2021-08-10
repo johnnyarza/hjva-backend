@@ -1,10 +1,12 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Material from '../../database/models/Material';
 import Provider from '../../database/models/Provider';
 import User from '../../database/models/User';
 import Category from '../../database/models/Category';
 import Measure from '../../database/models/Measure';
 import File from '../../database/models/MaterialFile';
+import MaterialReport from '../reports/MaterialReport';
 
 const defaultFindParams = {
   attributes: [
@@ -13,6 +15,7 @@ const defaultFindParams = {
     'notes',
     'stockQty',
     'toSell',
+    'price',
     'created_at',
     'updated_at',
   ],
@@ -132,36 +135,7 @@ class MaterialController {
     try {
       const materials = await Material.findAll({
         where: { toSell: true },
-        attributes: [
-          'id',
-          'name',
-          'notes',
-          'stockQty',
-          'toSell',
-          'created_at',
-          'updated_at',
-        ],
-        include: [
-          {
-            model: Provider,
-            as: 'provider',
-            attributes: ['id', 'name', 'email', 'address', 'phone', 'notes'],
-          },
-          {
-            model: Category,
-            as: 'category',
-            attributes: ['id', 'name'],
-          },
-          {
-            model: Measure,
-            as: 'measurement',
-            attributes: ['id', 'abbreviation'],
-          },
-          {
-            model: File,
-            as: 'file',
-          },
-        ],
+        ...defaultFindParams,
       });
       return res.json(materials);
     } catch (error) {
@@ -352,6 +326,65 @@ class MaterialController {
       return res.json(affectedRows);
     } catch (error) {
       await transaction.rollback();
+      return next(error);
+    }
+  }
+
+  async getReport(req, res, next) {
+    try {
+      const queries = Object.entries(req.query);
+      const { locale, toSell } = req.query;
+      console.log(queries);
+      const whereParams = {};
+      if (toSell) {
+        whereParams.toSell = toSell;
+      }
+
+      if (queries.length > 0) {
+        queries.forEach((query) => {
+          const [field, value] = query;
+          switch (field) {
+            case 'name':
+              whereParams[field] = {
+                [Op.iLike]: `%${value}%`,
+              };
+              break;
+
+            default:
+          }
+        });
+      }
+      console.log(whereParams);
+      const materials = await Material.findAll({
+        where: {
+          ...whereParams,
+        },
+
+        attributes: ['name', 'notes', 'stockQty', 'price'],
+        include: [
+          {
+            model: Provider,
+            as: 'provider',
+            attributes: ['name'],
+          },
+          {
+            model: Category,
+            as: 'category',
+            attributes: ['name'],
+          },
+          {
+            model: Measure,
+            as: 'measurement',
+            attributes: ['abbreviation'],
+          },
+        ],
+      });
+
+      MaterialReport.createPDF(materials, locale, (result) => {
+        res.end(result);
+      });
+      return '';
+    } catch (error) {
       return next(error);
     }
   }

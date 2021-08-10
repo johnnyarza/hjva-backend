@@ -30,6 +30,7 @@ routes.post('/user', UserController.store);
 routes.post('/session', SessionController.store);
 routes.get('/products', ProductController.index);
 routes.get('/material/:id', MaterialController.findById);
+routes.get('/report/material', MaterialController.getReport);
 routes.get('/materialsToSell', MaterialController.findAllToSellMaterials);
 routes.get('/categories', CategoryController.index);
 

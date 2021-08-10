@@ -12,6 +12,7 @@ class Material extends Model {
           type: Sequelize.DECIMAL,
           field: 'stock_qty',
         },
+        price: Sequelize.DECIMAL,
       },
       {
         hooks: {
