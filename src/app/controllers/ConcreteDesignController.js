@@ -4,6 +4,8 @@ import ConcreteDesign from '../../database/models/ConcreteDesign';
 import ConcreteDesignMaterial from '../../database/models/ConcreteDesignMaterial';
 import Material from '../../database/models/Material';
 import Measure from '../../database/models/Measure';
+import ConcreteDesingReport from '../reports/ConcreteDesingReport';
+import util from '../utils/utils';
 
 class ConcreteDesignController {
   async store(req, res, next) {
@@ -177,6 +179,23 @@ class ConcreteDesignController {
       return res.json(affectedRows);
     } catch (error) {
       transaction.rollback();
+      return next(error);
+    }
+  }
+
+  async getReport(req, res, next) {
+    try {
+      const whereParams = util.queryParams(req.query);
+      const locale = req.query?.locale ? req.query.locale : '';
+
+      const cats = await ConcreteDesign.findAll({
+        where: { ...whereParams },
+        attributes: ['name', 'slump', 'notes', 'updated_at'],
+      });
+      return ConcreteDesingReport.createPDF(cats, locale, (result) =>
+        res.end(result)
+      );
+    } catch (error) {
       return next(error);
     }
   }

@@ -1,6 +1,8 @@
 import * as Yup from 'yup';
 import Measure from '../../database/models/Measure';
 import User from '../../database/models/User';
+import MeasureReport from '../reports/MeasureReport';
+import util from '../utils/utils';
 
 class MeasureController {
   async store(req, res, next) {
@@ -85,6 +87,19 @@ class MeasureController {
       const affectedRows = await Measure.destroy({ where: { id } });
 
       return res.json(affectedRows);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getReport(req, res, next) {
+    try {
+      const whereParams = util.queryParams(req.query);
+      const cats = await Measure.findAll({
+        where: { ...whereParams },
+        attributes: ['abbreviation', 'notes', 'updated_at'],
+      });
+      return MeasureReport.createPDF(cats, '', (result) => res.end(result));
     } catch (error) {
       return next(error);
     }

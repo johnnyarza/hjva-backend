@@ -2,9 +2,8 @@ import PDFPrinter from 'pdfmake';
 import fs from 'fs';
 import { format } from 'date-fns';
 import fonts from './pdfFonts';
-import util from '../utils/utils';
 
-class MaterialReport {
+class CategoryReport {
   constructor() {
     this.printer = new PDFPrinter(fonts);
     this.logo = Buffer.from(fs.readFileSync('src/app/assets/HJVA-logo.png'));
@@ -37,7 +36,7 @@ class MaterialReport {
                 },
               },
               {
-                text: 'RELATORIO \n ESTOQUE',
+                text: 'RELATORIO \n CATEGORIAS',
                 style: 'header',
                 alignment: 'center',
               },
@@ -64,19 +63,22 @@ class MaterialReport {
       },
       content: [
         {
-          table: {
-            widths: [
-              'auto',
-              'auto',
-              'auto',
-              'auto',
-              'auto',
-              '*',
-              'auto',
-              'auto',
-            ],
-            headerRows: 1,
-          },
+          columns: [
+            { width: '*', text: '' },
+            {
+              width: 'auto',
+              table: {
+                widths: ['auto', 'auto'],
+                headerRows: 1,
+              },
+              layout: {
+                fillColor(rowIndex, node, columnIndex) {
+                  return rowIndex % 2 === 0 ? '#CCCCCC' : null;
+                },
+              },
+            },
+            { width: '*', text: '' },
+          ],
         },
       ],
       styles: {
@@ -88,7 +90,6 @@ class MaterialReport {
         columnTitles: {
           fontSize: 12,
           bold: true,
-
           lineHeight: 1,
         },
       },
@@ -96,22 +97,20 @@ class MaterialReport {
   }
 
   createColumnsHeaders() {
-    this.docsDefinitions.content[0].table.body = [
-      [
-        'Nombre',
-        'Categoria',
-        'Saldo',
-        'Unidad',
-        'Proveedor',
-        'Descripción',
-        'Valor',
-        'Actualizado',
-      ].map((text) => ({
+    this.docsDefinitions.content[0].columns[1].table.body = [
+      ['Nombre', 'Actualizado'].map((text) => ({
         table: {
+          widths: ['*'],
           heights: [0, 10, 0],
           body: [
             [{ text: '', style: 'columnTitles' }],
-            [{ text, style: 'columnTitles' }],
+            [
+              {
+                text,
+                style: 'columnTitles',
+                alignment: 'center',
+              },
+            ],
             [{ text: '', style: 'columnTitles' }],
           ],
         },
@@ -121,48 +120,19 @@ class MaterialReport {
     ];
   }
 
-  createRow(
-    {
-      name,
-      notes,
-      stockQty,
-      price,
-      category,
-      provider,
-      measurement,
-      dataValues,
-    },
-    locale,
-    index
-  ) {
+  createRow({ name, dataValues }, index) {
     return [
-      name,
-      { text: category.name, alignment: 'center' },
-      {
-        text: util.formatNumber(stockQty, locale),
-        alignment: 'center',
-      },
-      { text: measurement.abbreviation, alignment: 'center' },
-      { text: provider.name, alignment: 'center' },
-      { text: notes, alignment: 'left' },
-      {
-        text: price === '0' ? '-' : util.formatNumber(price, locale),
-        alignment: 'center',
-      },
+      { text: name, alignment: 'center' },
       {
         text: format(dataValues.updated_at, 'dd-MM-yyyy'),
         alignment: 'center',
       },
-    ].map((text) => {
-      const isOdd = index % 2 === 1;
-      if (isOdd) return { text, style: 'oddRows' };
-      return { text };
-    });
+    ];
   }
 
   createRows(data, locale) {
     data.forEach((row, index) => {
-      this.docsDefinitions.content[0].table.body.push(
+      this.docsDefinitions.content[0].columns[1].table.body.push(
         this.createRow(row, locale, index)
       );
     });
@@ -186,4 +156,4 @@ class MaterialReport {
   }
 }
 
-export default new MaterialReport();
+export default new CategoryReport();

@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import { Op } from 'sequelize';
+import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import Material from '../../database/models/Material';
 import Provider from '../../database/models/Provider';
 import User from '../../database/models/User';
@@ -7,6 +8,7 @@ import Category from '../../database/models/Category';
 import Measure from '../../database/models/Measure';
 import File from '../../database/models/MaterialFile';
 import MaterialReport from '../reports/MaterialReport';
+import util from '../utils/utils';
 
 const defaultFindParams = {
   attributes: [
@@ -332,35 +334,44 @@ class MaterialController {
 
   async getReport(req, res, next) {
     try {
-      const queries = Object.entries(req.query);
+      // const queries = Object.entries(req.query);
       const { locale, toSell } = req.query;
-      console.log(queries);
-      const whereParams = {};
+      const whereParams = util.queryParams(req.query);
       if (toSell) {
         whereParams.toSell = toSell;
       }
 
-      if (queries.length > 0) {
-        queries.forEach((query) => {
-          const [field, value] = query;
-          switch (field) {
-            case 'name':
-              whereParams[field] = {
-                [Op.iLike]: `%${value}%`,
-              };
-              break;
-
-            default:
-          }
-        });
-      }
-      console.log(whereParams);
+      // if (queries.length > 0) {
+      //   queries.forEach((query) => {
+      //     const [field, value] = query;
+      //     if (field === 'name') {
+      //       whereParams[field] = {
+      //         [Op.iLike]: `%${value}%`,
+      //       };
+      //     }
+      //     if (field === 'category' || field === 'provider') {
+      //       whereParams[`$${field}.name$`] = { [Op.iLike]: `%${value}%` };
+      //     }
+      //     if (field === 'measurement') {
+      //       whereParams[`$${field}.abbreviation$`] = {
+      //         [Op.iLike]: `%${value}%`,
+      //       };
+      //     }
+      //     if (field === 'updated_at') {
+      //       const { from, to } = JSON.parse(value);
+      //       whereParams[field] = {
+      //         [Op.gte]: startOfDay(parseISO(from)),
+      //         [Op.lte]: endOfDay(parseISO(to)),
+      //       };
+      //     }
+      //   });
+      // }
       const materials = await Material.findAll({
         where: {
           ...whereParams,
         },
 
-        attributes: ['name', 'notes', 'stockQty', 'price'],
+        attributes: ['name', 'notes', 'stockQty', 'price', 'updated_at'],
         include: [
           {
             model: Provider,
@@ -380,10 +391,9 @@ class MaterialController {
         ],
       });
 
-      MaterialReport.createPDF(materials, locale, (result) => {
+      return MaterialReport.createPDF(materials, locale, (result) => {
         res.end(result);
       });
-      return '';
     } catch (error) {
       return next(error);
     }

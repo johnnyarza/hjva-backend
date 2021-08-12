@@ -3,6 +3,8 @@ import Category from '../../database/models/Category';
 import Material from '../../database/models/Material';
 import Product from '../../database/models/Product';
 import User from '../../database/models/User';
+import CategoryReport from '../reports/CategoryReport';
+import util from '../utils/utils';
 
 class CategoryController {
   async store(req, res) {
@@ -113,6 +115,19 @@ class CategoryController {
     await Category.destroy({ where: { id } });
 
     return res.json('Categoria deletada');
+  }
+
+  async getReport(req, res, next) {
+    try {
+      const whereParams = util.queryParams(req.query);
+      const cats = await Category.findAll({
+        where: { ...whereParams },
+        attributes: ['name', 'updated_at'],
+      });
+      return CategoryReport.createPDF(cats, '', (result) => res.end(result));
+    } catch (error) {
+      return next(error);
+    }
   }
 }
 

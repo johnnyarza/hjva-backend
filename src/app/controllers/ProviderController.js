@@ -1,6 +1,8 @@
 import * as Yup from 'yup';
 import Provider from '../../database/models/Provider';
 import User from '../../database/models/User';
+import ProviderReport from '../reports/ProviderReport';
+import util from '../utils/utils';
 
 class ProviderController {
   async store(req, res, next) {
@@ -91,6 +93,19 @@ class ProviderController {
       const affectedRows = await Provider.destroy({ where: { id } });
 
       return res.json(affectedRows);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getReport(req, res, next) {
+    try {
+      const whereParams = util.queryParams(req.query);
+      const cats = await Provider.findAll({
+        where: { ...whereParams },
+        attributes: ['name', 'email', 'address', 'phone', 'updated_at'],
+      });
+      return ProviderReport.createPDF(cats, '', (result) => res.end(result));
     } catch (error) {
       return next(error);
     }

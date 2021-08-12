@@ -11,7 +11,7 @@ import ProductFileController from './app/controllers/ProductFileController';
 import auth from './app/middlewares/auth';
 import RoleController from './app/controllers/RoleController';
 import AvatarFileController from './app/controllers/AvatarFileController';
-import CLientController from './app/controllers/ClientController';
+import ClientController from './app/controllers/ClientController';
 import ProviderController from './app/controllers/ProviderController';
 import MaterialController from './app/controllers/MaterialController';
 import MeasureController from './app/controllers/MeasureController';
@@ -30,9 +30,14 @@ routes.post('/user', UserController.store);
 routes.post('/session', SessionController.store);
 routes.get('/products', ProductController.index);
 routes.get('/material/:id', MaterialController.findById);
-routes.get('/report/material', MaterialController.getReport);
 routes.get('/materialsToSell', MaterialController.findAllToSellMaterials);
 routes.get('/categories', CategoryController.index);
+routes.get('/report/material', MaterialController.getReport);
+routes.get('/report/category', CategoryController.getReport);
+routes.get('/report/measure', MeasureController.getReport);
+routes.get('/report/provider', ProviderController.getReport);
+routes.get('/report/client', ClientController.getReport);
+routes.get('/report/concreteDesign', ConcreteDesignController.getReport);
 
 routes.use(auth);
 
@@ -67,10 +72,10 @@ routes.post(
 
 routes.delete('/product/:id/file', ProductFileController.delete);
 
-routes.post('/client', CLientController.store);
-routes.put('/client/:id', CLientController.update);
-routes.delete('/client/:id', CLientController.delete);
-routes.get('/clients', CLientController.index);
+routes.post('/client', ClientController.store);
+routes.put('/client/:id', ClientController.update);
+routes.delete('/client/:id', ClientController.delete);
+routes.get('/clients', ClientController.index);
 
 routes.post('/provider', ProviderController.store);
 routes.put('/provider/:id', ProviderController.update);
