@@ -38,6 +38,7 @@ routes.get('/report/measure', MeasureController.getReport);
 routes.get('/report/provider', ProviderController.getReport);
 routes.get('/report/client', ClientController.getReport);
 routes.get('/report/concreteDesign', ConcreteDesignController.getReport);
+routes.get('/report/compressionTest', CompressionTestController.getReport);
 
 routes.use(auth);
 

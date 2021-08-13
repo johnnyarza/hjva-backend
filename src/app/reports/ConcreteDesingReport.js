@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import fonts from './pdfFonts';
 import util from '../utils/utils';
 
-class MeasureReport {
+class CompressionTestReport {
   constructor() {
     this.printer = new PDFPrinter(fonts);
     this.logo = Buffer.from(fs.readFileSync('src/app/assets/HJVA-logo.png'));
@@ -67,7 +67,6 @@ class MeasureReport {
           columns: [
             { width: '*', text: '' },
             {
-              width: 'auto',
               table: {
                 widths: ['auto', 'auto', 'auto', 'auto'],
                 headerRows: 1,
@@ -123,20 +122,79 @@ class MeasureReport {
 
   createRow({ name, slump, notes, dataValues }, locale, index) {
     return [
-      { text: name, alignment: 'center' },
-      { text: util.formatNumber(slump, locale), alignment: 'center' },
-      { text: notes, alignment: 'center' },
+      { text: name, alignment: 'center', fillColor: '#2980b9' },
+      {
+        text: util.formatNumber(slump, locale),
+        alignment: 'center',
+        fillColor: '#2980b9',
+      },
+      { text: notes, alignment: 'center', fillColor: '#2980b9' },
       {
         text: format(dataValues.updated_at, 'dd-MM-yyyy'),
         alignment: 'center',
+        fillColor: '#2980b9',
       },
+    ];
+  }
+
+  createMaterialDesignRow({ name, concreteDesignMaterial }, locale, index) {
+    const ma = concreteDesignMaterial.map((m) => {
+      const { material, quantity_per_m3 } = m;
+      const { measurement } = material;
+      return [
+        {
+          text: material.name,
+          alignment: 'center',
+          colSpan: 2,
+        },
+        {},
+        {
+          text: `${quantity_per_m3} ${measurement.abbreviation}`,
+          alignment: 'center',
+          colSpan: 2,
+        },
+        {},
+      ];
+    });
+
+    return [
+      [
+        {
+          text: `Materiales ${name}`,
+          alignment: 'center',
+          colSpan: 4,
+          fillColor: '#2980b9',
+        },
+        {},
+        {},
+        {},
+      ],
+      [
+        {
+          text: 'Nombre',
+          alignment: 'center',
+          colSpan: 2,
+          fillColor: '#2980b9',
+        },
+        {},
+        {
+          text: 'Cantidad / m³',
+          alignment: 'center',
+          colSpan: 2,
+          fillColor: '#2980b9',
+        },
+        {},
+      ],
+      ...ma,
     ];
   }
 
   createRows(data, locale) {
     data.forEach((row, index) => {
       this.docsDefinitions.content[0].columns[1].table.body.push(
-        this.createRow(row, locale, index)
+        this.createRow(row, locale, index),
+
+        ...this.createMaterialDesignRow(row)
       );
     });
   }
@@ -158,4 +216,4 @@ class MeasureReport {
   }
 }
 
-export default new MeasureReport();
+export default new CompressionTestReport();

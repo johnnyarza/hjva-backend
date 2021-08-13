@@ -8,6 +8,9 @@ import ConcreteDesign from '../../database/models/ConcreteDesign';
 import ConcreteDesignMaterial from '../../database/models/ConcreteDesignMaterial';
 import ConcreteSample from '../../database/models/ConcreteSample';
 import Material from '../../database/models/Material';
+import util from '../utils/utils';
+import CompressionTestReport from '../reports/CompressionTestReport';
+import Measure from '../../database/models/Measure';
 
 class CompressionTestController {
   async store(req, res, next) {
@@ -58,6 +61,7 @@ class CompressionTestController {
         { transaction }
       );
       await transaction.commit();
+
       const compressionTest = await CompressionTest.findByPk(id, {
         attributes: ['id', 'tracker', 'notes', 'updatedAt'],
         include: [
@@ -92,6 +96,7 @@ class CompressionTestController {
           },
         ],
       });
+
       return res.json(compressionTest);
     } catch (error) {
       await transaction.rollback();
@@ -298,6 +303,65 @@ class CompressionTestController {
       return res.json(affectedRows);
     } catch (error) {
       await transaction.rollback();
+      return next(error);
+    }
+  }
+
+  async getReport(req, res, next) {
+    try {
+      const whereParams = util.queryParams(req.query);
+      const locale = req.query?.locale ? req.query.locale : '';
+      const printConcreteDesign = !!req.query?.printConcreteDesign;
+
+      const cats = await CompressionTest.findAll({
+        where: { ...whereParams },
+        attributes: ['tracker', 'notes', 'updated_at'],
+        include: [
+          {
+            model: Client,
+            as: 'client',
+            attributes: ['name'],
+          },
+          {
+            model: Client,
+            as: 'concreteProvider',
+            attributes: ['name'],
+          },
+          {
+            model: ConcreteDesign,
+            as: 'concreteDesign',
+            attributes: ['name', 'slump', 'notes'],
+            include: [
+              {
+                model: ConcreteDesignMaterial,
+                as: 'concreteDesignMaterial',
+                attributes: ['quantity_per_m3'],
+                include: [
+                  {
+                    model: Material,
+                    as: 'material',
+                    attributes: ['name'],
+                    include: [
+                      {
+                        model: Measure,
+                        as: 'measurement',
+                        attributes: ['abbreviation'],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      return CompressionTestReport.createPDF(
+        cats,
+        { locale, printConcreteDesign },
+        (result) => res.end(result)
+      );
+    } catch (error) {
       return next(error);
     }
   }

@@ -188,11 +188,32 @@ class ConcreteDesignController {
       const whereParams = util.queryParams(req.query);
       const locale = req.query?.locale ? req.query.locale : '';
 
-      const cats = await ConcreteDesign.findAll({
+      const data = await ConcreteDesign.findAll({
         where: { ...whereParams },
         attributes: ['name', 'slump', 'notes', 'updated_at'],
+        include: [
+          {
+            model: ConcreteDesignMaterial,
+            as: 'concreteDesignMaterial',
+            attributes: ['quantity_per_m3'],
+            include: [
+              {
+                model: Material,
+                as: 'material',
+                attributes: ['name'],
+                include: [
+                  {
+                    model: Measure,
+                    as: 'measurement',
+                    attributes: ['abbreviation'],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       });
-      return ConcreteDesingReport.createPDF(cats, locale, (result) =>
+      return ConcreteDesingReport.createPDF(data, locale, (result) =>
         res.end(result)
       );
     } catch (error) {
