@@ -186,7 +186,6 @@ class CompressionTestController {
       if (!id) {
         return res.status(400).json({ message: 'Concrete Design Id is empty' });
       }
-      console.log({ id, ...req.body });
 
       const {
         concreteDesignId: concrete_design_id,
