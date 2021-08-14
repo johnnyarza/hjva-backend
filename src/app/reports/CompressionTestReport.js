@@ -133,7 +133,7 @@ class MeasureReport {
         body: [],
       },
       layout: {
-        fillColor(rowIndex, node, columnIndex) {
+        fillColor(rowIndex) {
           return rowIndex % 2 === 0 ? '#CCCCCC' : null;
         },
       },
@@ -143,21 +143,136 @@ class MeasureReport {
     this.docsDefinitions.content.push(layout);
   }
 
+  createCompressionTestTableWithoutMaterialDesign(table, row, locale) {
+    table.body.push(this.createRow(row, locale));
+  }
+
   createDocDefinitions(data, locale, printConcreteDesign) {
     this.docsDefinitions.content = [];
-    data.forEach((row, index) => {
-      this.createCompressionTestTable(row, locale);
-      if (printConcreteDesign)
+
+    if (!printConcreteDesign) {
+      const layout = {
+        table: {
+          widths: this.widths,
+          headerRows: 1,
+          body: [],
+        },
+        layout: {
+          fillColor(rowIndex, node, columnIndex) {
+            return rowIndex % 2 === 0 ? '#CCCCCC' : null;
+          },
+        },
+      };
+
+      this.createColumnsHeaders(layout.table);
+      data.forEach((row, index) => {
+        this.createCompressionTestTableWithoutMaterialDesign(
+          layout.table,
+          row,
+          locale
+        );
+      });
+
+      this.docsDefinitions.content.push(layout);
+    }
+
+    if (printConcreteDesign) {
+      data.forEach((row, index) => {
+        this.createCompressionTestTable(row, locale);
         this.createMaterialDesignTable(row, locale, index);
-    });
+
+        this.docsDefinitions.content.push('\n');
+      });
+    }
   }
 
   createMaterialDesignTable({ concreteDesign, dataValues }, locale, index) {
+    console.log(concreteDesign);
     const { concreteDesignMaterial } = concreteDesign;
     const { name, slump, notes } = concreteDesign;
+
+    const concreteDesignTitle = [
+      { text: 'Nombre', alignment: 'center', colSpan: 2, fillColor: '#2980b9' },
+      {},
+      {
+        text: 'Slump',
+        alignment: 'center',
+        fillColor: '#2980b9',
+      },
+      {
+        text: 'Descripción ',
+        alignment: 'center',
+        fillColor: '#2980b9',
+        colSpan: 2,
+      },
+      {},
+    ];
+    const concreteDesignRow = [
+      { text: concreteDesign.name, alignment: 'center', colSpan: 2 },
+      {},
+      {
+        text: concreteDesign.slump,
+        alignment: 'center',
+      },
+      {
+        text: concreteDesign.notes,
+        alignment: 'center',
+
+        colSpan: 2,
+      },
+      {},
+    ];
+    const materialsTitle = [
+      {
+        text: 'Material',
+        alignment: 'center',
+        fillColor: '#2980b9',
+      },
+      {
+        text: 'Proveedor',
+        alignment: 'center',
+        fillColor: '#2980b9',
+        colSpan: 2,
+      },
+      {},
+      {
+        text: `Consumo / m³`,
+        alignment: 'center',
+        colSpan: 2,
+        fillColor: '#2980b9',
+      },
+
+      {},
+    ];
+
+    const materialsRows = concreteDesignMaterial.map((m) => {
+      const { material, quantity_per_m3 } = m;
+      const { measurement, provider } = material;
+      const { dataValues: dV } = measurement;
+
+      return [
+        {
+          text: material.name,
+          alignment: 'center',
+        },
+        {
+          text: provider.name,
+          alignment: 'center',
+          colSpan: 2,
+        },
+        {},
+        {
+          text: `${quantity_per_m3} ${dV.abbr}`,
+          alignment: 'center',
+          colSpan: 2,
+        },
+        {},
+      ];
+    });
+
     const layout = {
       table: {
-        widths: this.widths,
+        widths: ['20%', '20%', '20%', '20%', '20%'],
         headerRows: 1,
         body: [
           [
@@ -174,6 +289,10 @@ class MeasureReport {
             {},
             {},
           ],
+          concreteDesignTitle,
+          concreteDesignRow,
+          materialsTitle,
+          ...materialsRows,
         ],
       },
       layout: {
@@ -182,61 +301,11 @@ class MeasureReport {
         },
       },
     };
+
     this.docsDefinitions.content.push(layout);
-
-    // const concreteDesignTitle = [
-    //   { text: 'Nombre', alignment: 'center', colSpan: 2 },
-    //   {},
-    //   {
-    //     text: util.formatNumber(slump, locale),
-    //     alignment: 'center',
-    //     fillColor: '#2980b9',
-    //   },
-    //   { text: notes, alignment: 'center', fillColor: '#2980b9', colSpan: 2 },
-    //   {},
-    // ];
-
-    // const materialsRows = concreteDesignMaterial.map((m) => {
-    //   const { material, quantity_per_m3 } = m;
-    //   const { measurement } = material;
-
-    //   return [
-    //     {
-    //       text: material.name,
-    //       alignment: 'center',
-    //       colSpan: 2,
-    //     },
-    //     {},
-    //     {
-    //       text: `${quantity_per_m3} ${measurement.abbreviation}`,
-    //       alignment: 'center',
-    //       colSpan: 2,
-    //     },
-    //     {},
-    //   ];
-    // });
-
-    // [
-    //   {
-    //     text: 'Nombre',
-    //     alignment: 'center',
-    //     colSpan: 3,
-    //     fillColor: '#2980b9',
-    //   },
-    //   {},
-    //   {},
-    //   {
-    //     text: 'Cantidad / m³',
-    //     alignment: 'center',
-    //     colSpan: 2,
-    //     fillColor: '#2980b9',
-    //   },
-    //   {},
-    // ],
   }
 
   createPDF(data = [], { locale = 'en-US', printConcreteDesign }, callback) {
-    console.log(printConcreteDesign);
     this.createDocDefinitions(data, locale, printConcreteDesign);
     const pdfDoc = this.printer.createPdfKitDocument(this.docsDefinitions);
     const chuncks = [];

@@ -11,6 +11,7 @@ import Material from '../../database/models/Material';
 import util from '../utils/utils';
 import CompressionTestReport from '../reports/CompressionTestReport';
 import Measure from '../../database/models/Measure';
+import Provider from '../../database/models/Provider';
 
 class CompressionTestController {
   async store(req, res, next) {
@@ -340,12 +341,15 @@ class CompressionTestController {
                   {
                     model: Material,
                     as: 'material',
-                    attributes: ['name'],
+                    attributes: ['id', 'name'],
                     include: [
                       {
                         model: Measure,
                         as: 'measurement',
-                        attributes: ['abbreviation'],
+                      },
+                      {
+                        model: Provider,
+                        as: 'provider',
                       },
                     ],
                   },

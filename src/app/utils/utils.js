@@ -35,12 +35,18 @@ const util = {
             [Op.iLike]: `%${value}%`,
           };
         }
-        if (field === 'slump') {
+        if (field === 'slump' || field === 'tracker') {
           whereParams[field] = {
             [Op.eq]: `${value}`,
           };
         }
-        if (field === 'category' || field === 'provider') {
+        if (
+          field === 'category' ||
+          field === 'provider' ||
+          field === 'concreteProvider' ||
+          field === 'concreteDesign' ||
+          field === 'client'
+        ) {
           whereParams[`$${field}.name$`] = { [Op.iLike]: `%${value}%` };
         }
         if (field === 'measurement') {
