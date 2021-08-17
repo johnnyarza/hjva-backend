@@ -1,5 +1,6 @@
 import Sequelize, { Model } from 'sequelize';
 import { v4 as uuid } from 'uuid';
+import ConcreteDesignMaterial from './ConcreteDesignMaterial';
 
 class Material extends Model {
   static init(sequelize) {
@@ -42,6 +43,10 @@ class Material extends Model {
     this.hasMany(models.MaterialFile, {
       foreignKey: 'material_id',
       as: 'file',
+    });
+    this.belongsToMany(models.ConcreteDesign, {
+      through: ConcreteDesignMaterial,
+      as: 'concreteDesign',
     });
   }
 }

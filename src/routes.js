@@ -39,6 +39,7 @@ routes.get('/report/provider', ProviderController.getReport);
 routes.get('/report/client', ClientController.getReport);
 routes.get('/report/concreteDesign', ConcreteDesignController.getReport);
 routes.get('/report/compressionTest', CompressionTestController.getReport);
+routes.get('/report/concreteSample', ConcreteSampleController.getReport);
 
 routes.use(auth);
 

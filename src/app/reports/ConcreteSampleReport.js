@@ -4,9 +4,21 @@ import { format } from 'date-fns';
 import fonts from './pdfFonts';
 import util from '../utils/utils';
 
-class MeasureReport {
+class ConcreteSample {
   constructor() {
-    this.widths = ['10%', '20%', '20%', '30%', '20%'];
+    this.widths = [
+      '5%',
+      '14%',
+      '8%',
+      '10%',
+      '9%',
+      '9%',
+      '9%',
+      '9%',
+      '9%',
+      '9%',
+      '9%',
+    ];
     this.printer = new PDFPrinter(fonts);
     this.logo = Buffer.from(fs.readFileSync('src/app/assets/HJVA-logo.png'));
     this.docsDefinitions = {
@@ -82,15 +94,21 @@ class MeasureReport {
   createCompressionTestColumnsHeaders(table) {
     table.body = [
       [
-        'Doc. Nª',
-        'Cliente',
-        'Prov. Hormigón',
+        'Prob. Nª',
         'Descripción',
-        'Actualizado',
+        'Slump (cm)',
+        'Moldeo',
+        'Rotura',
+        'Días',
+        'Ø\n(cm)',
+        'Altura (cm)',
+        'Peso\n(kg)',
+        'Rotura (ton)',
+        'Rotura (MPa)',
       ].map((text) => ({
         table: {
           widths: ['*'],
-          heights: [0, 10, 0],
+          heights: ['1%', '98%', '1%'],
           body: [
             [{ text: '', style: 'columnTitles' }],
             [
@@ -109,28 +127,21 @@ class MeasureReport {
     ];
   }
 
-  createCompressionTestRow(
-    { client, concreteProvider, notes, dataValues, concreteDesign },
-    locale,
-    printConcreteDesign
-  ) {
+  createConcreteSampleRow(row, locale, printConcreteDesign) {
+    const { dataValues } = row;
+    const { notes, slump, sampledAt } = row;
     return [
       { text: dataValues.tracker || '-', alignment: 'center' },
-      { text: client.name || '-', alignment: 'center' },
-      { text: concreteProvider.name || '-', alignment: 'center' },
-      {
-        text: !printConcreteDesign
-          ? `${concreteDesign.name}, SLUMP:${util.formatNumber(
-              concreteDesign.slump,
-              locale
-            )}. ${notes || '-'}`
-          : notes || '-',
-        alignment: 'center',
-      },
-      {
-        text: format(dataValues.updated_at, 'dd-MM-yyyy') || '-',
-        alignment: 'center',
-      },
+      { text: notes || '-', alignment: 'center' },
+      { text: slump || '-', alignment: 'center' },
+      { text: format(sampledAt, 'dd-MM-yyyy') || '-', alignment: 'center' },
+      { text: dataValues.tracker || '-', alignment: 'center' },
+      { text: dataValues.tracker || '-', alignment: 'center' },
+      { text: dataValues.tracker || '-', alignment: 'center' },
+      { text: dataValues.tracker || '-', alignment: 'center' },
+      { text: dataValues.tracker || '-', alignment: 'center' },
+      { text: dataValues.tracker || '-', alignment: 'center' },
+      { text: dataValues.tracker || '-', alignment: 'center' },
     ];
   }
 
@@ -149,7 +160,7 @@ class MeasureReport {
     };
     this.createCompressionTestColumnsHeaders(layout.table);
     layout.table.body.push(
-      this.createCompressionTestRow(row, locale, printConcreteDesign)
+      this.createConcreteSampleRow(row, locale, printConcreteDesign)
     );
     this.docsDefinitions.content.push(layout);
   }
@@ -161,7 +172,7 @@ class MeasureReport {
     printConcreteDesign
   ) {
     table.body.push(
-      this.createCompressionTestRow(row, locale, printConcreteDesign)
+      this.createConcreteSampleRow(row, locale, printConcreteDesign)
     );
   }
 
@@ -313,42 +324,41 @@ class MeasureReport {
   createDocDefinitions(data, locale, printConcreteDesign) {
     this.docsDefinitions.content = [];
 
-    if (!printConcreteDesign) {
-      const layout = {
-        table: {
-          widths: this.widths,
-          headerRows: 1,
-          body: [],
+    const layout = {
+      table: {
+        widths: this.widths,
+        heights: 'auto',
+        headerRows: 1,
+        body: [],
+      },
+      layout: {
+        fillColor(rowIndex) {
+          return rowIndex % 2 === 0 ? '#CCCCCC' : null;
         },
-        layout: {
-          fillColor(rowIndex) {
-            return rowIndex % 2 === 0 ? '#CCCCCC' : null;
-          },
-        },
-      };
+      },
+    };
 
-      this.createCompressionTestColumnsHeaders(layout.table);
-      data.forEach((row) => {
-        this.createCompressionTestTableWithoutMaterialDesign(
-          layout.table,
-          row,
-          locale,
-          printConcreteDesign
-        );
-      });
+    this.createCompressionTestColumnsHeaders(layout.table);
+    data.forEach((row) => {
+      this.createCompressionTestTableWithoutMaterialDesign(
+        layout.table,
+        row,
+        locale,
+        printConcreteDesign
+      );
+    });
 
-      this.docsDefinitions.content.push(layout);
-    }
+    this.docsDefinitions.content.push(layout);
 
-    if (printConcreteDesign) {
-      data.forEach((row, index) => {
-        this.createCompressionTestTable(row, locale, printConcreteDesign);
-        this.createConcreteDesignTable(row, locale, index);
+    // if (printConcreteDesign) {
+    //   data.forEach((row, index) => {
+    //     this.createCompressionTestTable(row, locale, printConcreteDesign);
+    //     this.createConcreteDesignTable(row, locale, index);
 
-        if (data.length > 0 && index < data.length - 1)
-          this.docsDefinitions.content.push({ text: '', pageBreak: 'after' });
-      });
-    }
+    //     if (data.length > 0 && index < data.length - 1)
+    //       this.docsDefinitions.content.push({ text: '', pageBreak: 'after' });
+    //   });
+    // }
   }
 
   createPDF(data = [], { locale = 'en-US', printConcreteDesign }, callback) {
@@ -366,4 +376,4 @@ class MeasureReport {
   }
 }
 
-export default new MeasureReport();
+export default new ConcreteSample();

@@ -3,6 +3,10 @@ import Client from '../../database/models/Client';
 import CompressionTest from '../../database/models/CompressionTest';
 import ConcreteDesign from '../../database/models/ConcreteDesign';
 import ConcreteSample from '../../database/models/ConcreteSample';
+import Material from '../../database/models/Material';
+import Measure from '../../database/models/Measure';
+import ConcreteSampleReport from '../reports/ConcreteSampleReport';
+import util from '../utils/utils';
 
 class ConcreteSampleController {
   async store(req, res, next) {
@@ -303,6 +307,53 @@ class ConcreteSampleController {
       });
 
       return res.json(updatedConcreteSample);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getReport(req, res, next) {
+    try {
+      const whereParams = util.queryParams(req.query);
+      const locale = req.query?.locale ? req.query.locale : '';
+      const printConcreteDesign = req.query?.printConcreteDesign === 'true';
+
+      const data = await ConcreteSample.findAll({
+        attributes: { include: ['tracker'] },
+        where: { ...whereParams },
+        include: [
+          {
+            model: CompressionTest,
+            as: 'compressionTest',
+          },
+          {
+            model: ConcreteDesign,
+            as: 'concreteDesign',
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+            include: [
+              {
+                model: Material,
+                as: 'materials',
+                attributes: ['id', 'name'],
+                include: [
+                  {
+                    model: Measure,
+                    as: 'measurement',
+                    attributes: ['id', 'abbreviation'],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      // return res.json(data);
+
+      return ConcreteSampleReport.createPDF(
+        data,
+        { locale, printConcreteDesign },
+        (result) => res.end(result)
+      );
     } catch (error) {
       return next(error);
     }

@@ -311,7 +311,7 @@ class CompressionTestController {
     try {
       const whereParams = util.queryParams(req.query);
       const locale = req.query?.locale ? req.query.locale : '';
-      const printConcreteDesign = !!req.query?.printConcreteDesign;
+      const printConcreteDesign = req.query?.printConcreteDesign === 'true';
 
       const cats = await CompressionTest.findAll({
         where: { ...whereParams },

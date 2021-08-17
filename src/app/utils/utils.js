@@ -35,7 +35,14 @@ const util = {
             [Op.iLike]: `%${value}%`,
           };
         }
-        if (field === 'slump' || field === 'tracker') {
+        if (
+          field === 'slump' ||
+          field === 'tracker' ||
+          field === 'load' ||
+          field === 'height' ||
+          field === 'diameter' ||
+          field === 'weight'
+        ) {
           whereParams[field] = {
             [Op.eq]: `${value}`,
           };
@@ -49,12 +56,19 @@ const util = {
         ) {
           whereParams[`$${field}.name$`] = { [Op.iLike]: `%${value}%` };
         }
+        if (field === 'compressionTest') {
+          whereParams[`$${field}.id$`] = { [Op.eq]: `${value}` };
+        }
         if (field === 'measurement') {
           whereParams[`$${field}.abbreviation$`] = {
             [Op.iLike]: `%${value}%`,
           };
         }
-        if (field === 'updated_at') {
+        if (
+          field === 'updated_at' ||
+          field === 'loaded_at' ||
+          field === 'sampled_at'
+        ) {
           const { from, to } = JSON.parse(value);
           whereParams[field] = {
             [Op.gte]: startOfDay(parseISO(from)),

@@ -6,6 +6,22 @@ class ConcreteDesignMaterial extends Model {
     super.init(
       {
         quantity_per_m3: Sequelize.DECIMAL,
+        material_id: {
+          type: Sequelize.STRING,
+          field: 'material_id',
+          references: {
+            model: 'Material',
+            key: 'id',
+          },
+        },
+        concrete_design_id: {
+          type: Sequelize.STRING,
+          field: 'concrete_design_id',
+          references: {
+            model: 'ConcreteDesign',
+            key: 'id',
+          },
+        },
       },
       {
         hooks: {
