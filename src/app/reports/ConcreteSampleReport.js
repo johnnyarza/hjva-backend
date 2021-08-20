@@ -4,15 +4,15 @@ import { format } from 'date-fns';
 import fonts from './pdfFonts';
 import util from '../utils/utils';
 
-class ConcreteSample {
+class ConcreteSampleReport {
   constructor() {
     this.widths = [
       '5%',
-      '14%',
-      '8%',
+      '15%',
+      '7%',
       '10%',
-      '9%',
-      '9%',
+      '10%',
+      '8%',
       '9%',
       '9%',
       '9%',
@@ -91,7 +91,7 @@ class ConcreteSample {
     };
   }
 
-  createCompressionTestColumnsHeaders(table) {
+  createConcreteSamplesColumnsHeaders(table) {
     table.body = [
       [
         'Prob. Nª',
@@ -127,53 +127,90 @@ class ConcreteSample {
     ];
   }
 
-  createConcreteSampleRow(row, locale, printConcreteDesign) {
+  createConcreteSampleRow(row, locale) {
     const { dataValues } = row;
-    const { notes, slump, sampledAt } = row;
+    const {
+      notes,
+      slump,
+      sampledAt,
+      loadedAt,
+      days,
+      diameter,
+      height,
+      weight,
+      load,
+      mPa,
+    } = row;
     return [
       { text: dataValues.tracker || '-', alignment: 'center' },
       { text: notes || '-', alignment: 'center' },
-      { text: slump || '-', alignment: 'center' },
+      { text: util.formatNumber(slump, locale) || '-', alignment: 'center' },
       { text: format(sampledAt, 'dd-MM-yyyy') || '-', alignment: 'center' },
-      { text: dataValues.tracker || '-', alignment: 'center' },
-      { text: dataValues.tracker || '-', alignment: 'center' },
-      { text: dataValues.tracker || '-', alignment: 'center' },
-      { text: dataValues.tracker || '-', alignment: 'center' },
-      { text: dataValues.tracker || '-', alignment: 'center' },
-      { text: dataValues.tracker || '-', alignment: 'center' },
-      { text: dataValues.tracker || '-', alignment: 'center' },
+      { text: format(loadedAt, 'dd-MM-yyyy') || '-', alignment: 'center' },
+      { text: days || '-', alignment: 'center' },
+      { text: util.formatNumber(diameter, locale) || '-', alignment: 'center' },
+      { text: util.formatNumber(height, locale) || '-', alignment: 'center' },
+      {
+        text: util.formatNumber(weight, locale, 3) || '-',
+        alignment: 'center',
+      },
+      {
+        text: util.formatNumber(Number(load), locale) || '-',
+        alignment: 'center',
+      },
+      {
+        text: util.formatNumber(Number(mPa), locale) || '-',
+        alignment: 'center',
+      },
     ];
   }
 
-  createCompressionTestTable(row, locale, printConcreteDesign) {
-    const layout = {
-      table: {
-        widths: this.widths,
-        headerRows: 1,
-        body: [],
-      },
-      layout: {
-        fillColor(rowIndex) {
-          return rowIndex % 2 === 0 ? '#CCCCCC' : null;
+  createCompressionTestColumnsHeaders(table) {
+    table.body = [
+      [
+        'Doc. Nª',
+        'Cliente',
+        'Prov. Hormigón',
+        'Descripción',
+        'Actualizado',
+      ].map((text) => ({
+        table: {
+          widths: ['*'],
+          heights: ['1%', '98%', '1%'],
+          body: [
+            [{ text: '', style: 'columnTitles' }],
+            [
+              {
+                text,
+                style: 'columnTitles',
+                alignment: 'center',
+              },
+            ],
+            [{ text: '', style: 'columnTitles' }],
+          ],
         },
-      },
-    };
-    this.createCompressionTestColumnsHeaders(layout.table);
-    layout.table.body.push(
-      this.createConcreteSampleRow(row, locale, printConcreteDesign)
-    );
-    this.docsDefinitions.content.push(layout);
+        layout: 'noBorders',
+        fillColor: '#2ecc71',
+      })),
+    ];
   }
 
-  createCompressionTestTableWithoutMaterialDesign(
-    table,
-    row,
-    locale,
-    printConcreteDesign
-  ) {
-    table.body.push(
-      this.createConcreteSampleRow(row, locale, printConcreteDesign)
-    );
+  createCompressionRow(table, compressionTest, locale) {
+    const {
+      dataValues,
+      client,
+      concreteProvider,
+      notes,
+      updatedAt,
+    } = compressionTest;
+    console.log(dataValues);
+    table.body.push([
+      { text: dataValues.tracker || '-', alignment: 'center' },
+      { text: client.name || '-', alignment: 'center' },
+      { text: concreteProvider.name || '-', alignment: 'center' },
+      { text: notes || '-', alignment: 'center' },
+      { text: format(updatedAt, 'dd-MM-yyyy') || '-', alignment: 'center' },
+    ]);
   }
 
   createConcreteDesignMaterialTableTitle() {
@@ -323,8 +360,8 @@ class ConcreteSample {
 
   createDocDefinitions(data, locale, printConcreteDesign) {
     this.docsDefinitions.content = [];
-
-    const layout = {
+    const { compressionTest } = data[0];
+    const concreteSampleLayout = {
       table: {
         widths: this.widths,
         heights: 'auto',
@@ -337,18 +374,37 @@ class ConcreteSample {
         },
       },
     };
+    const compressionTestLayout = {
+      table: {
+        widths: ['5%', '21.5%', '19.5%', '44%', '10%'],
+        heights: 'auto',
+        headerRows: 1,
+        body: [],
+      },
+      layout: {
+        fillColor(rowIndex) {
+          return rowIndex % 2 === 0 ? '#CCCCCC' : null;
+        },
+      },
+    };
 
-    this.createCompressionTestColumnsHeaders(layout.table);
+    this.createCompressionTestColumnsHeaders(compressionTestLayout.table);
+    this.createCompressionRow(
+      compressionTestLayout.table,
+      compressionTest,
+      locale
+    );
+
+    this.createConcreteSamplesColumnsHeaders(concreteSampleLayout.table);
     data.forEach((row) => {
-      this.createCompressionTestTableWithoutMaterialDesign(
-        layout.table,
-        row,
-        locale,
-        printConcreteDesign
+      concreteSampleLayout.table.body.push(
+        this.createConcreteSampleRow(row, locale)
       );
     });
 
-    this.docsDefinitions.content.push(layout);
+    this.docsDefinitions.content.push(compressionTestLayout);
+    this.docsDefinitions.content.push('\n');
+    this.docsDefinitions.content.push(concreteSampleLayout);
 
     // if (printConcreteDesign) {
     //   data.forEach((row, index) => {
@@ -376,4 +432,4 @@ class ConcreteSample {
   }
 }
 
-export default new ConcreteSample();
+export default new ConcreteSampleReport();

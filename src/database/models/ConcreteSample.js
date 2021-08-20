@@ -30,7 +30,9 @@ class ConcreteSample extends Model {
         days: {
           type: Sequelize.VIRTUAL,
           get() {
-            return differenceInDays(new Date(), this.getDataValue('sampledAt'));
+            const load = this.getDataValue('load');
+            const date = load > 0 ? this.getDataValue('loadedAt') : new Date();
+            return differenceInDays(date, this.getDataValue('sampledAt'));
           },
         },
         sampledAt: { type: Sequelize.DATE, field: 'sampled_at' },
@@ -40,11 +42,6 @@ class ConcreteSample extends Model {
         hooks: {
           beforeCreate: (c, _) => {
             c.id = uuid();
-          },
-          afterFind: (c, _) => {
-            if (c) {
-              c.days = differenceInDays(new Date(), c.sampledAt);
-            }
           },
         },
         sequelize,

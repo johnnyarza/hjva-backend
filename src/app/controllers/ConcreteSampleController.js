@@ -325,6 +325,19 @@ class ConcreteSampleController {
           {
             model: CompressionTest,
             as: 'compressionTest',
+            attributes: ['id', 'notes', 'tracker', 'updatedAt'],
+            include: [
+              {
+                model: Client,
+                as: 'client',
+                attributes: ['name'],
+              },
+              {
+                model: Client,
+                as: 'concreteProvider',
+                attributes: ['name'],
+              },
+            ],
           },
           {
             model: ConcreteDesign,

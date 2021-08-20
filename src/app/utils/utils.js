@@ -4,11 +4,11 @@ import { Op } from 'sequelize';
 const util = {
   userRoles: ['admin', 'office', 'seller', 'lab', 'common'],
   productsGrantedAccess: ['admin', 'office'],
-  formatNumber(num, locale) {
+  formatNumber(num, locale, minimumFractionDigits = 2) {
     const currentLocale = locale || 'en-US';
     if (num) {
       const formater = Intl.NumberFormat(currentLocale, {
-        minimumFractionDigits: 2,
+        minimumFractionDigits,
       });
       let number = num;
 
