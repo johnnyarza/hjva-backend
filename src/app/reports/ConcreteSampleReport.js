@@ -195,7 +195,7 @@ class ConcreteSampleReport {
     ];
   }
 
-  createCompressionRow(table, compressionTest, locale) {
+  createCompressionRow(table, compressionTest) {
     const {
       dataValues,
       client,
@@ -203,7 +203,7 @@ class ConcreteSampleReport {
       notes,
       updatedAt,
     } = compressionTest;
-    console.log(dataValues);
+
     table.body.push([
       { text: dataValues.tracker || '-', alignment: 'center' },
       { text: client.name || '-', alignment: 'center' },
@@ -211,33 +211,6 @@ class ConcreteSampleReport {
       { text: notes || '-', alignment: 'center' },
       { text: format(updatedAt, 'dd-MM-yyyy') || '-', alignment: 'center' },
     ]);
-  }
-
-  createConcreteDesignMaterialTableTitle() {
-    return [
-      {
-        text: 'Nombre',
-        alignment: 'center',
-        colSpan: 2,
-        fillColor: '#2980b9',
-        style: 'columnTitles',
-      },
-      {},
-      {
-        text: 'Slump',
-        alignment: 'center',
-        fillColor: '#2980b9',
-        style: 'columnTitles',
-      },
-      {
-        text: 'Descripción ',
-        alignment: 'center',
-        fillColor: '#2980b9',
-        colSpan: 2,
-        style: 'columnTitles',
-      },
-      {},
-    ];
   }
 
   createConCreteDesignRow(concreteDesign, locale) {
@@ -259,25 +232,30 @@ class ConcreteSampleReport {
     ];
   }
 
-  createConcreteDesignMaterialsRows(concreteDesignMaterial = [], locale) {
-    return concreteDesignMaterial.map((m) => {
-      const { material, quantity_per_m3 } = m;
-      const { measurement, provider } = material;
-      const { dataValues: dV } = measurement;
+  createConcreteDesignMaterialsRows(materials = [], locale) {
+    return materials.map((material) => {
+      const {
+        name,
+        measurement: { abbreviation },
+        ConcreteDesignMaterial: { quantity_per_m3 },
+        provider: { name: providerName },
+      } = material;
 
       return [
         {
-          text: material.name,
-          alignment: 'center',
-        },
-        {
-          text: provider.name,
+          text: name,
           alignment: 'center',
           colSpan: 2,
         },
+
         {},
         {
-          text: `${util.formatNumber(quantity_per_m3, locale)} ${dV.abbr}`,
+          text: providerName,
+          alignment: 'center',
+        },
+
+        {
+          text: `${util.formatNumber(quantity_per_m3, locale)} ${abbreviation}`,
           alignment: 'center',
           colSpan: 2,
         },
@@ -286,11 +264,12 @@ class ConcreteSampleReport {
     });
   }
 
-  createConcreteDesignTableTitle(concreteDesign = {}, dataValues = {}) {
+  createConcreteDesignTableTitle({ concreteDesign = {}, locale }) {
+    const { notes, name, slump } = concreteDesign;
     return [
       {
-        text: `Dosificación ${concreteDesign.name} - Doc. Nª${
-          dataValues.tracker || '-'
+        text: `Dosificación ${name} ${notes ? `-${notes}-` : ''} ${
+          slump ? `- Slump ${util.formatNumber(slump, locale)}cm` : ''
         }`,
         alignment: 'center',
         colSpan: 5,
@@ -305,23 +284,24 @@ class ConcreteSampleReport {
   }
 
   createConcreteDesignTable({ concreteDesign, dataValues }, locale) {
-    const { concreteDesignMaterial } = concreteDesign;
+    const { materials } = concreteDesign;
 
-    const materialsTitle = [
+    const concreteDesignMaterialTitle = [
       {
         text: 'Material',
         alignment: 'center',
         fillColor: '#2980b9',
         style: 'columnTitles',
+        colSpan: 2,
       },
+      {},
       {
         text: 'Proveedor',
         alignment: 'center',
         fillColor: '#2980b9',
-        colSpan: 2,
+
         style: 'columnTitles',
       },
-      {},
       {
         text: `Consumo / m³`,
         alignment: 'center',
@@ -333,34 +313,19 @@ class ConcreteSampleReport {
       {},
     ];
 
-    const layout = {
-      table: {
-        widths: ['20%', '20%', '20%', '20%', '20%'],
-        headerRows: 1,
-        body: [
-          this.createConcreteDesignTableTitle(concreteDesign, dataValues),
-          this.createConcreteDesignMaterialTableTitle(),
-          this.createConCreteDesignRow(concreteDesign, locale),
-          materialsTitle,
-          ...this.createConcreteDesignMaterialsRows(
-            concreteDesignMaterial,
-            locale
-          ),
-        ],
-      },
-      layout: {
-        fillColor(rowIndex) {
-          return rowIndex % 2 === 0 ? '#CCCCCC' : null;
-        },
-      },
-    };
-
-    this.docsDefinitions.content.push(layout);
+    return [
+      this.createConcreteDesignTableTitle({
+        concreteDesign,
+        dataValues,
+        locale,
+      }),
+      concreteDesignMaterialTitle,
+      ...this.createConcreteDesignMaterialsRows(materials, locale),
+    ];
   }
 
-  createDocDefinitions(data, locale, printConcreteDesign) {
+  createDocDefinitions(data, compressionTest, locale, printConcreteDesign) {
     this.docsDefinitions.content = [];
-    const { compressionTest } = data[0];
     const concreteSampleLayout = {
       table: {
         widths: this.widths,
@@ -395,6 +360,11 @@ class ConcreteSampleReport {
       locale
     );
 
+    if (printConcreteDesign)
+      compressionTestLayout.table.body.push(
+        ...this.createConcreteDesignTable(compressionTest, locale)
+      );
+
     this.createConcreteSamplesColumnsHeaders(concreteSampleLayout.table);
     data.forEach((row) => {
       concreteSampleLayout.table.body.push(
@@ -405,20 +375,20 @@ class ConcreteSampleReport {
     this.docsDefinitions.content.push(compressionTestLayout);
     this.docsDefinitions.content.push('\n');
     this.docsDefinitions.content.push(concreteSampleLayout);
-
-    // if (printConcreteDesign) {
-    //   data.forEach((row, index) => {
-    //     this.createCompressionTestTable(row, locale, printConcreteDesign);
-    //     this.createConcreteDesignTable(row, locale, index);
-
-    //     if (data.length > 0 && index < data.length - 1)
-    //       this.docsDefinitions.content.push({ text: '', pageBreak: 'after' });
-    //   });
-    // }
   }
 
-  createPDF(data = [], { locale = 'en-US', printConcreteDesign }, callback) {
-    this.createDocDefinitions(data, locale, printConcreteDesign);
+  createPDF(
+    data = [],
+    compressionTest = {},
+    { locale = 'en-US', printConcreteDesign },
+    callback
+  ) {
+    this.createDocDefinitions(
+      data,
+      compressionTest,
+      locale,
+      printConcreteDesign
+    );
     const pdfDoc = this.printer.createPdfKitDocument(this.docsDefinitions);
     const chuncks = [];
 

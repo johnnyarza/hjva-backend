@@ -5,6 +5,7 @@ import ConcreteDesign from '../../database/models/ConcreteDesign';
 import ConcreteSample from '../../database/models/ConcreteSample';
 import Material from '../../database/models/Material';
 import Measure from '../../database/models/Measure';
+import Provider from '../../database/models/Provider';
 import ConcreteSampleReport from '../reports/ConcreteSampleReport';
 import util from '../utils/utils';
 
@@ -317,6 +318,50 @@ class ConcreteSampleController {
       const whereParams = util.queryParams(req.query);
       const locale = req.query?.locale ? req.query.locale : '';
       const printConcreteDesign = req.query?.printConcreteDesign === 'true';
+      const { compressionTest: compressionTestId } = req.query;
+
+      if (!compressionTestId) {
+        res.status(400).json({ message: 'CompressionTestId is null' });
+      }
+
+      const compressionTest = await CompressionTest.findByPk(
+        compressionTestId,
+        {
+          attributes: { include: ['tracker'] },
+          include: [
+            { model: Client, as: 'client', attributes: ['id', 'name'] },
+            {
+              model: Client,
+              as: 'concreteProvider',
+              attributes: ['id', 'name'],
+            },
+            {
+              model: ConcreteDesign,
+              as: 'concreteDesign',
+              attributes: { exclude: ['createdAt', 'updatedAt'] },
+              include: [
+                {
+                  model: Material,
+                  as: 'materials',
+                  attributes: ['id', 'name'],
+                  include: [
+                    {
+                      model: Measure,
+                      as: 'measurement',
+                      attributes: ['id', 'abbreviation'],
+                    },
+                    {
+                      model: Provider,
+                      as: 'provider',
+                      attributes: ['id', 'name'],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        }
+      );
 
       const data = await ConcreteSample.findAll({
         attributes: { include: ['tracker'] },
@@ -325,45 +370,15 @@ class ConcreteSampleController {
           {
             model: CompressionTest,
             as: 'compressionTest',
-            attributes: ['id', 'notes', 'tracker', 'updatedAt'],
-            include: [
-              {
-                model: Client,
-                as: 'client',
-                attributes: ['name'],
-              },
-              {
-                model: Client,
-                as: 'concreteProvider',
-                attributes: ['name'],
-              },
-            ],
-          },
-          {
-            model: ConcreteDesign,
-            as: 'concreteDesign',
-            attributes: { exclude: ['createdAt', 'updatedAt'] },
-            include: [
-              {
-                model: Material,
-                as: 'materials',
-                attributes: ['id', 'name'],
-                include: [
-                  {
-                    model: Measure,
-                    as: 'measurement',
-                    attributes: ['id', 'abbreviation'],
-                  },
-                ],
-              },
-            ],
           },
         ],
       });
       // return res.json(data);
+      // return res.json(compressionTest);
 
       return ConcreteSampleReport.createPDF(
         data,
+        compressionTest,
         { locale, printConcreteDesign },
         (result) => res.end(result)
       );
