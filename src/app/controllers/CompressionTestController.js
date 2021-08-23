@@ -152,7 +152,7 @@ class CompressionTestController {
               compression_test_id: compressionTest.id,
               load: 0,
               loadedAt: {
-                [Op.lt]: startOfDay(new Date()),
+                [Op.lte]: startOfDay(new Date()),
               },
             },
           });
