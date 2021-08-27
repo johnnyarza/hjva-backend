@@ -94,6 +94,25 @@ class ConcreteSampleReport {
   createConcreteSamplesColumnsHeaders(table) {
     table.body = [
       [
+        {
+          text: 'Probetas',
+          style: 'columnTitles',
+          colSpan: 11,
+          fillColor: '#2ecc71',
+          alignment: 'center',
+        },
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+      ],
+      [
         'Prob. Nª',
         'Descripción',
         'Slump (cm)',
@@ -167,6 +186,19 @@ class ConcreteSampleReport {
 
   createCompressionTestColumnsHeaders(table) {
     table.body = [
+      [
+        {
+          text: 'Documento',
+          style: 'columnTitles',
+          colSpan: 5,
+          fillColor: '#2ecc71',
+          alignment: 'center',
+        },
+        {},
+        {},
+        {},
+        {},
+      ],
       [
         'Doc. Nª',
         'Cliente',
