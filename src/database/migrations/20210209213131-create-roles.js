@@ -46,6 +46,12 @@ module.exports = {
             created_at: new Date(),
             updated_at: new Date(),
           },
+          {
+            id: v4(),
+            name: 'estoque',
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
         ]);
       });
   },

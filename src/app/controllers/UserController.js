@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import User from '../../database/models/User';
 import Role from '../../database/models/Role';
 import Avatar from '../../database/models/Avatar';
@@ -195,6 +196,23 @@ class UserController {
           error: 'Usuário solicitante não tem privelégios suficientes',
         });
       }
+
+      if (userToUpdaterole.role === 'admin' && req.body.role !== 'admin') {
+        const count = await User.count({
+          where: {
+            id: {
+              [Op.ne]: userToUpdaterole.id,
+            },
+            role: { [Op.eq]: 'admin' },
+          },
+        });
+        console.table(count);
+        if (count === 0) {
+          return res.status(403).json({
+            error: 'Deve existir pelo menos 1 admin',
+          });
+        }
+      }
       const roleExists = await Role.findOne({ where: { name: req.body.role } });
 
       if (!roleExists) {
@@ -213,7 +231,7 @@ class UserController {
       const { dataValues: updatedUser } = await User.findByPk(
         userToUpdateRoleId,
         {
-          attributes: ['id', 'name', 'email', 'role'],
+          attributes: ['id', 'name', 'role'],
         }
       );
 
