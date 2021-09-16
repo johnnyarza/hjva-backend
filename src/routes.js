@@ -21,6 +21,7 @@ import CompressionTestController from './app/controllers/CompressionTestControll
 import ConcreteSampleController from './app/controllers/ConcreteSampleController';
 import MaterialTransactionController from './app/controllers/MaterialTransactionController';
 import MaterialFileController from './app/controllers/MaterialFileController';
+import needsToBe from './app/middlewares/needsToBe';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -119,14 +120,46 @@ routes.put('/compressionTest/:id', CompressionTestController.update);
 routes.delete('/compressionTest/:id', CompressionTestController.delete);
 routes.get('/compressionTests', CompressionTestController.index);
 
-routes.post('/concreteSample', ConcreteSampleController.store);
-routes.put('/concreteSample/:id', ConcreteSampleController.update);
-routes.delete('/concreteSample/:id', ConcreteSampleController.delete);
-routes.get('/concreteSamples', ConcreteSampleController.index);
+routes.post(
+  '/concreteSample',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'escritorio', 'admin']),
+  ConcreteSampleController.store
+);
+routes.put(
+  '/concreteSample/:id',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'escritorio', 'admin']),
+  ConcreteSampleController.update
+);
+routes.delete(
+  '/concreteSample/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  ConcreteSampleController.delete
+);
+routes.get(
+  '/concreteSamples',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'escritorio', 'admin']),
+  ConcreteSampleController.index
+);
 
-routes.post('/materialTransaction', MaterialTransactionController.store);
+routes.post(
+  '/materialTransaction',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['estoque', 'escritorio', 'admin']),
+  MaterialTransactionController.store
+);
 routes.get('/materialTransactions', MaterialTransactionController.index);
-routes.delete('/materialTransaction/:id', MaterialTransactionController.delete);
-routes.put('/materialTransaction/:id', MaterialTransactionController.update);
+routes.delete(
+  '/materialTransaction/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  MaterialTransactionController.delete
+);
+routes.put(
+  '/materialTransaction/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  MaterialTransactionController.update
+);
 
 export default routes;
