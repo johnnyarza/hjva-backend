@@ -27,10 +27,10 @@ class ConcreteDesignController {
         return res.status(400).json({ message: 'Erro de validação' });
       }
 
-      const { name, notes } = req.body;
+      const { name, notes, slump } = req.body;
 
       const concreteDesign = await ConcreteDesign.create(
-        { name, notes },
+        { name, notes, slump },
         { transaction }
       );
 
@@ -41,10 +41,11 @@ class ConcreteDesignController {
         })
       );
 
-      await ConcreteDesignMaterial.bulkCreate(concreteDesignMaterial, {
-        individualHooks: true,
-        transaction,
-      });
+      await Promise.all(
+        concreteDesignMaterial.map((c) =>
+          ConcreteDesignMaterial.create(c, { transaction })
+        )
+      );
 
       await transaction.commit();
 

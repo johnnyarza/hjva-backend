@@ -5,6 +5,7 @@ class ConcreteDesignMaterial extends Model {
   static init(sequelize) {
     super.init(
       {
+        id: { type: Sequelize.UUID, primaryKey: true },
         quantity_per_m3: Sequelize.DECIMAL,
         material_id: {
           type: Sequelize.STRING,

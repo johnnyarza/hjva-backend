@@ -59,9 +59,22 @@ routes.post('/users/avatar', upload.single('file'), AvatarFileController.store);
 
 routes.post('/category', CategoryController.store);
 
-routes.get('/category/byname', CategoryController.findByName);
-routes.delete('/category/:id', CategoryController.delete);
-routes.put('/category/:id', CategoryController.update);
+routes.get(
+  '/category/byname',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['escritorio', 'admin', 'estoque']),
+  CategoryController.findByName
+);
+routes.delete(
+  '/category/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'estoque']),
+  CategoryController.delete
+);
+routes.put(
+  '/category/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  CategoryController.update
+);
 
 routes.post('/product', ProductController.store);
 routes.put('/product/:id', ProductController.update);
@@ -75,50 +88,157 @@ routes.post(
 
 routes.delete('/product/:id/file', ProductFileController.delete);
 
-routes.post('/client', ClientController.store);
-routes.put('/client/:id', ClientController.update);
-routes.delete('/client/:id', ClientController.delete);
+routes.post(
+  '/client',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['escritorio', 'admin', 'estoque']),
+  ClientController.store
+);
+routes.put(
+  '/client/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  ClientController.update
+);
+routes.delete(
+  '/client/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  ClientController.delete
+);
 routes.get('/clients', ClientController.index);
 
-routes.post('/provider', ProviderController.store);
-routes.put('/provider/:id', ProviderController.update);
-routes.delete('/provider/:id', ProviderController.delete);
+routes.post(
+  '/provider',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['escritorio', 'admin', 'estoque']),
+  ProviderController.store
+);
+routes.put(
+  '/provider/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  ProviderController.update
+);
+routes.delete(
+  '/provider/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  ProviderController.delete
+);
 routes.get('/providers', ProviderController.index);
 
-routes.post('/material', MaterialController.store);
+routes.post(
+  '/material',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['escritorio', 'admin', 'estoque', 'vendedor']),
+  MaterialController.store
+);
 routes.get('/materials', MaterialController.index);
-routes.put('/material/:id', MaterialController.update);
+routes.put(
+  '/material/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  MaterialController.update
+);
 
-routes.delete('/material/:id', MaterialController.delete);
-routes.delete('/material/:id/file', MaterialFileController.delete);
+routes.delete(
+  '/material/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  MaterialController.delete
+);
+routes.delete(
+  '/material/:id/file',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  MaterialFileController.delete
+);
 routes.post(
   '/material/:id/file',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['escritorio', 'admin', 'estoque', 'vendedor']),
   upload.single('file'),
   MaterialFileController.store
 );
 
-routes.post('/measure', MeasureController.store);
+routes.post(
+  '/measure',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['escritorio', 'admin', 'estoque']),
+  MeasureController.store
+);
 routes.get('/measurements', MeasureController.index);
-routes.put('/measure/:id', MeasureController.update);
-routes.delete('/measure/:id', MeasureController.delete);
+routes.put(
+  '/measure/:id',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['escritorio', 'admin', 'estoque']),
+  MeasureController.update
+);
+routes.delete(
+  '/measure/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  MeasureController.delete
+);
 
-routes.post('/concreteDesignMaterial', ConcreteDesignMaterialController.store);
-routes.put('/concreteDesignMaterial/', ConcreteDesignMaterialController.update);
+routes.post(
+  '/concreteDesignMaterial',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['admin', 'escritorio', 'laboratorio']),
+  ConcreteDesignMaterialController.store
+);
+routes.put(
+  '/concreteDesignMaterial/',
+  (req, res, next) => needsToBe(req, res, next, ['admin', 'escritorio']),
+  ConcreteDesignMaterialController.update
+);
 routes.get('/concreteDesignMaterials', ConcreteDesignMaterialController.index);
 routes.delete(
   '/concreteDesignMaterial/:id',
+  (req, res, next) => needsToBe(req, res, next, ['admin', 'escritorio']),
   ConcreteDesignMaterialController.delete
 );
 
-routes.post('/concreteDesign', ConcreteDesignController.store);
-routes.put('/concreteDesign/:id', ConcreteDesignController.update);
-routes.delete('/concreteDesign/:id', ConcreteDesignController.delete);
-routes.get('/concreteDesigns', ConcreteDesignController.index);
+routes.post(
+  '/concreteDesign',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['admin', 'escritorio', 'laboratorio']),
+  ConcreteDesignController.store
+);
+routes.put(
+  '/concreteDesign/:id',
+  (req, res, next) => needsToBe(req, res, next, ['admin', 'escritorio']),
+  ConcreteDesignController.update
+);
+routes.delete(
+  '/concreteDesign/:id',
+  (req, res, next) => needsToBe(req, res, next, ['admin', 'escritorio']),
+  ConcreteDesignController.delete
+);
+routes.get(
+  '/concreteDesigns',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'admin', 'escritorio']),
+  ConcreteDesignController.index
+);
 
-routes.post('/compressionTest', CompressionTestController.store);
-routes.put('/compressionTest/:id', CompressionTestController.update);
-routes.delete('/compressionTest/:id', CompressionTestController.delete);
-routes.get('/compressionTests', CompressionTestController.index);
+routes.post(
+  '/compressionTest',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'escritorio', 'admin']),
+  CompressionTestController.store
+);
+routes.put(
+  '/compressionTest/:id',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'escritorio', 'admin']),
+  CompressionTestController.update
+);
+routes.delete(
+  '/compressionTest/:id',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'escritorio', 'admin']),
+  CompressionTestController.delete
+);
+routes.get(
+  '/compressionTests',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'escritorio', 'admin']),
+  CompressionTestController.index
+);
 
 routes.post(
   '/concreteSample',
