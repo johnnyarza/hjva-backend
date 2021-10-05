@@ -62,12 +62,12 @@ routes.post('/category', CategoryController.store);
 routes.get(
   '/category/byname',
   (req, res, next) =>
-    needsToBe(req, res, next, ['escritorio', 'admin', 'estoque']),
+    needsToBe(req, res, next, ['escritorio', 'admin', 'estoque', 'vendedor']),
   CategoryController.findByName
 );
 routes.delete(
   '/category/:id',
-  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'estoque']),
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
   CategoryController.delete
 );
 routes.put(
