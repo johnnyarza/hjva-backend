@@ -22,9 +22,13 @@ import ConcreteSampleController from './app/controllers/ConcreteSampleController
 import MaterialTransactionController from './app/controllers/MaterialTransactionController';
 import MaterialFileController from './app/controllers/MaterialFileController';
 import needsToBe from './app/middlewares/needsToBe';
+import MaterialToConcreteDesgin from './app/controllers/MaterialToConcreteDesgin';
 
 const routes = new Router();
 const upload = multer(multerConfig);
+
+routes.post('/materialToConcreteDesign', MaterialToConcreteDesgin.store);
+routes.get('/materialsToConcreteDesigns', MaterialToConcreteDesgin.index);
 
 routes.get('/', (req, res) => res.json({ message: 'Hello world' }));
 routes.post('/user', UserController.store);
@@ -41,6 +45,7 @@ routes.get('/report/client', ClientController.getReport);
 routes.get('/report/concreteDesign', ConcreteDesignController.getReport);
 routes.get('/report/compressionTest', CompressionTestController.getReport);
 routes.get('/report/concreteSample', ConcreteSampleController.getReport);
+routes.post('/user', UserController.store);
 
 routes.use(auth);
 

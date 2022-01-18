@@ -1,6 +1,3 @@
-import jwt from 'jsonwebtoken';
-import { promisify } from 'util';
-import authConfig from '../../config/auth';
 import User from '../../database/models/User';
 
 const needsToBe = async (req, res, next, role = ['admin']) => {

@@ -16,6 +16,7 @@ import ConcreteSample from './models/ConcreteSample';
 import ConcreteDesignMaterial from './models/ConcreteDesignMaterial';
 import MaterialTransaction from './models/MaterialTransaction';
 import MaterialFile from './models/MaterialFile';
+import MaterialToConcreteDesign from './models/MaterialToConcreteDesign';
 
 import config from '../config/database';
 
@@ -36,6 +37,7 @@ const models = [
   Material,
   Measure,
   MaterialFile,
+  MaterialToConcreteDesign,
 ];
 
 class Database {
