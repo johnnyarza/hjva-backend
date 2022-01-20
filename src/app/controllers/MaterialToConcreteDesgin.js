@@ -3,10 +3,33 @@ import Material from '../../database/models/Material';
 import MaterialToConcreteDesign from '../../database/models/MaterialToConcreteDesign';
 
 class MaterialToConcreteDesignController {
+  // TODO Completar controllet
+  async delete(req, res, next) {
+    const transaction = await MaterialToConcreteDesign.sequelize.transaction();
+    try {
+      const { id } = req.params;
+      // TODO Adicionar verificação de material em uso
+      if (!id) {
+        return res.status(400).json({ message: 'id is empty' });
+      }
+
+      const affectedLines = await MaterialToConcreteDesign.destroy({
+        where: { material_id: id },
+        transaction,
+      });
+      await transaction.commit();
+
+      return res.json(affectedLines);
+    } catch (error) {
+      await transaction.rollback();
+      return next(error);
+    }
+  }
+
   async index(req, res, next) {
     try {
       const materialsToConcreteDesigns = await MaterialToConcreteDesign.findAll(
-        { include: [{ model: Material, as: 'materials' }] }
+        { include: [{ model: Material, as: 'material' }] }
       );
       return res.json(materialsToConcreteDesigns);
     } catch (error) {

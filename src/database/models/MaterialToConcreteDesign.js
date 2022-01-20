@@ -1,6 +1,5 @@
 import Sequelize, { Model } from 'sequelize';
 import { v4 as uuid } from 'uuid';
-import ConcreteDesignMaterial from './ConcreteDesignMaterial';
 
 class MaterialToConcreteDesign extends Model {
   static init(sequelize) {
@@ -31,7 +30,7 @@ class MaterialToConcreteDesign extends Model {
   static associate(models) {
     this.belongsTo(models.Material, {
       foreignKey: 'material_id',
-      as: 'materials',
+      as: 'material',
     });
   }
 }

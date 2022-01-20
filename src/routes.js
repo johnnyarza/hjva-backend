@@ -29,6 +29,10 @@ const upload = multer(multerConfig);
 
 routes.post('/materialToConcreteDesign', MaterialToConcreteDesgin.store);
 routes.get('/materialsToConcreteDesigns', MaterialToConcreteDesgin.index);
+routes.delete(
+  '/materialsToConcreteDesign/:id',
+  MaterialToConcreteDesgin.delete
+);
 
 routes.get('/', (req, res) => res.json({ message: 'Hello world' }));
 routes.post('/user', UserController.store);
