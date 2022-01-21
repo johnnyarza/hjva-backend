@@ -1,11 +1,11 @@
 import * as Yup from 'yup';
+import ConcreteDesignMaterial from '../../database/models/ConcreteDesignMaterial';
 import Material from '../../database/models/Material';
 import MaterialToConcreteDesign from '../../database/models/MaterialToConcreteDesign';
 
 class MaterialToConcreteDesignController {
   // TODO Completar controllet
   async delete(req, res, next) {
-    const transaction = await MaterialToConcreteDesign.sequelize.transaction();
     try {
       const { id } = req.params;
       // TODO Adicionar verificação de material em uso
@@ -13,15 +13,21 @@ class MaterialToConcreteDesignController {
         return res.status(400).json({ message: 'id is empty' });
       }
 
+      const inUse = await ConcreteDesignMaterial.count({
+        where: {
+          material_id: id,
+        },
+      });
+      if (inUse) {
+        return res.status(403).json({ message: 'Material en uso' });
+      }
+
       const affectedLines = await MaterialToConcreteDesign.destroy({
         where: { material_id: id },
-        transaction,
       });
-      await transaction.commit();
 
       return res.json(affectedLines);
     } catch (error) {
-      await transaction.rollback();
       return next(error);
     }
   }
