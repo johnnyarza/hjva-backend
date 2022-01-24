@@ -10,6 +10,14 @@ import ConcreteSampleReport from '../reports/ConcreteSampleReport';
 import util from '../utils/utils';
 
 class ConcreteSampleController {
+  async getLateConcreteSamples(req, res, next) {
+    try {
+      return res.json({ message: 'ok' });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async store(req, res, next) {
     const transaction = await ConcreteSample.sequelize.transaction();
     try {
@@ -31,6 +39,7 @@ class ConcreteSampleController {
       });
 
       if (!(await schema.isValid(req.body))) {
+        await transaction.rollback();
         return res.status(400).json({ message: 'Validation error' });
       }
       const { compressionTestId, concreteDesignId } = req.body;
@@ -176,22 +185,30 @@ class ConcreteSampleController {
   }
 
   async delete(req, res, next) {
+    const transaction = await ConcreteSample.sequelize.transaction();
     try {
       const { id } = req.params;
 
       if (!id) {
+        await transaction.rollback();
         return res.status(400).json({ message: 'Concrete Sample id empty' });
       }
 
-      const affectedRows = await ConcreteSample.destroy({ where: { id } });
+      const affectedRows = await ConcreteSample.destroy({
+        where: { id },
+        transaction,
+      });
+      await transaction.commit();
 
       return res.json(affectedRows);
     } catch (error) {
+      await transaction.rollback();
       return next(error);
     }
   }
 
   async update(req, res, next) {
+    const transaction = await ConcreteSample.sequelize.transaction();
     try {
       const { id } = req.params;
       const schema = Yup.object().shape({
@@ -208,16 +225,19 @@ class ConcreteSampleController {
       });
 
       if (!(await schema.isValid(req.body))) {
+        await transaction.rollback();
         return res.status(400).json({ message: 'Validation error' });
       }
 
       if (!id) {
+        await transaction.rollback();
         return res.status(400).json({ message: 'Concrete sample id is empty' });
       }
 
       const concreteSampleExists = await ConcreteSample.findByPk(id);
 
       if (!concreteSampleExists) {
+        await transaction.rollback();
         return res.status(404).json({ message: 'Concrete sample not found' });
       }
       const {
@@ -230,6 +250,7 @@ class ConcreteSampleController {
           compression_test_id
         );
         if (!compressionTestExists) {
+          await transaction.rollback();
           return res
             .status(404)
             .json({ message: 'Compression test not found' });
@@ -240,6 +261,7 @@ class ConcreteSampleController {
           concrete_design_id
         );
         if (!compressionTestExists) {
+          await transaction.rollback();
           return res.status(404).json({ message: 'Concrete Design not found' });
         }
       }
@@ -268,10 +290,11 @@ class ConcreteSampleController {
           compression_test_id,
           concrete_design_id,
         },
-        { where: { id } }
+        { where: { id }, transaction }
       );
 
       const updatedConcreteSample = await ConcreteSample.findByPk(id, {
+        transaction,
         include: [
           {
             model: CompressionTest,
@@ -307,8 +330,10 @@ class ConcreteSampleController {
         },
       });
 
+      await transaction.commit();
       return res.json(updatedConcreteSample);
     } catch (error) {
+      await transaction.rollback();
       return next(error);
     }
   }

@@ -26,7 +26,7 @@ import MaterialToConcreteDesgin from './app/controllers/MaterialToConcreteDesgin
 
 const routes = new Router();
 const upload = multer(multerConfig);
-
+// TODO apply auth to new routes
 routes.post('/materialToConcreteDesign', MaterialToConcreteDesgin.store);
 routes.get('/materialsToConcreteDesigns', MaterialToConcreteDesgin.index);
 routes.delete(
