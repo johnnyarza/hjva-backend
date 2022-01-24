@@ -4,6 +4,7 @@ import ConcreteDesign from '../../database/models/ConcreteDesign';
 import ConcreteDesignMaterial from '../../database/models/ConcreteDesignMaterial';
 import Material from '../../database/models/Material';
 import Measure from '../../database/models/Measure';
+import ConcreteSample from '../../database/models/ConcreteSample';
 import ConcreteDesingReport from '../reports/ConcreteDesingReport';
 import util from '../utils/utils';
 
@@ -168,7 +169,20 @@ class ConcreteDesignController {
       const { id } = req.params;
 
       if (!id) {
+        transaction.rollback();
         return res.status(400).json({ message: 'ConcreteDesign id empty' });
+      }
+
+      const inUse = await ConcreteSample.findOne({
+        where: [
+          {
+            concrete_design_id: id,
+          },
+        ],
+      });
+      if (inUse) {
+        transaction.rollback();
+        return res.status(403).json({ message: 'Dosificacíon en uso' });
       }
 
       const affectedRows = await ConcreteDesign.destroy({
