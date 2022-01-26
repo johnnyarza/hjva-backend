@@ -254,8 +254,8 @@ class MaterialController {
     const transaction = await Material.sequelize.transaction();
     try {
       const { id } = req.params;
-      const { userId: requestingId } = req;
-      const requestingUser = await User.findByPk(requestingId);
+      // const { userId: requestingId } = req;
+      // const requestingUser = await User.findByPk(requestingId);
 
       if (!id) {
         return res.status(400).json({ message: 'Product id is empty' });
@@ -293,21 +293,25 @@ class MaterialController {
       const { userId: requestingId } = req;
 
       if (!id) {
+        await transaction.rollback();
         return res.status(400).json({ message: 'Product id is empty' });
       }
       if (!requestingId) {
+        await transaction.rollback();
         return res.status(400).json({ message: 'Requesting user id is empty' });
       }
 
       const requestingUser = await User.findByPk(requestingId);
 
       if (!requestingUser) {
+        await transaction.rollback();
         return res.status(404).json({ message: 'Requesting user not found' });
       }
 
       const { role } = requestingUser;
 
       if (!(role === 'admin' || role === 'escritorio')) {
+        await transaction.rollback();
         return res
           .status(403)
           .json({ message: 'User does not have enough privileges' });

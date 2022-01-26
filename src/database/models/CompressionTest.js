@@ -6,6 +6,7 @@ class CompressionTest extends Model {
     super.init(
       {
         notes: Sequelize.STRING,
+        tracker: Sequelize.NUMBER,
         hasWarning: {
           type: Sequelize.VIRTUAL,
         },
@@ -23,6 +24,10 @@ class CompressionTest extends Model {
   }
 
   static associate(models) {
+    this.hasMany(models.ConcreteSample, {
+      foreignKey: 'compression_test_id',
+      as: 'concreteSample',
+    });
     this.belongsTo(models.ConcreteDesign, {
       foreignKey: 'concrete_design_id',
       as: 'concreteDesign',

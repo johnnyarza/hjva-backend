@@ -14,6 +14,32 @@ import Measure from '../../database/models/Measure';
 import Provider from '../../database/models/Provider';
 
 class CompressionTestController {
+  async getDelayedCompressionTests(req, res, next) {
+    try {
+      const test = await CompressionTest.findAll({
+        where: {
+          [Op.and]: [
+            { '$concreteSample.load$': 0 },
+            {
+              '$concreteSample.loaded_at$': {
+                [Op.lte]: startOfDay(new Date()),
+              },
+            },
+          ],
+        },
+        include: [
+          {
+            model: ConcreteSample,
+            as: 'concreteSample',
+          },
+        ],
+      });
+      return res.json(test);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async store(req, res, next) {
     const transaction = await CompressionTest.sequelize.transaction();
     try {
@@ -25,6 +51,7 @@ class CompressionTestController {
       });
 
       if (!(await schema.isValid(req.body))) {
+        await transaction.rollback();
         return res.status(400).json({ message: 'Validation error' });
       }
       const {
@@ -40,6 +67,7 @@ class CompressionTestController {
       );
 
       if (!concreteDesignExists) {
+        await transaction.rollback();
         return res.status(404).json({ message: 'Concrete Design not found' });
       }
 
@@ -49,6 +77,7 @@ class CompressionTestController {
       );
 
       if (!clientExists || !concreteProviderExists) {
+        await transaction.rollback();
         return res.status(404).json({ message: 'Client not found' });
       }
 
@@ -180,10 +209,12 @@ class CompressionTestController {
       });
 
       if (!(await schema.isValid(req.body))) {
+        await transaction.rollback();
         return res.status(400).json({ message: 'Validation error' });
       }
 
       if (!id) {
+        await transaction.rollback();
         return res.status(400).json({ message: 'Concrete Design Id is empty' });
       }
 
@@ -200,6 +231,7 @@ class CompressionTestController {
         );
 
         if (!concreteDesignExists) {
+          await transaction.rollback();
           return res.status(404).json({ message: 'Concrete Design not found' });
         }
       }
@@ -208,6 +240,7 @@ class CompressionTestController {
         const clientExists = await Client.findByPk(client_id);
 
         if (!clientExists) {
+          await transaction.rollback();
           return res.status(404).json({ message: 'Client not found' });
         }
       }
@@ -215,6 +248,7 @@ class CompressionTestController {
         const providerExists = await Client.findByPk(concrete_provider_id);
 
         if (!providerExists) {
+          await transaction.rollback();
           return res
             .status(404)
             .json({ message: 'Concrete Provider not found' });
@@ -293,6 +327,7 @@ class CompressionTestController {
     try {
       const { id } = req.params;
       if (!id) {
+        await transaction.rollback();
         return res.status(400).json({ message: 'Concrete Design id is empty' });
       }
       const affectedRows = await CompressionTest.destroy({

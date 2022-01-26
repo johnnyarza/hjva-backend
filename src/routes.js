@@ -33,6 +33,10 @@ routes.delete(
   '/materialsToConcreteDesign/:id',
   MaterialToConcreteDesgin.delete
 );
+routes.get(
+  '/compressionTests/delayed',
+  CompressionTestController.getDelayedCompressionTests
+);
 
 routes.get('/', (req, res) => res.json({ message: 'Hello world' }));
 routes.post('/user', UserController.store);

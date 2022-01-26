@@ -10,14 +10,6 @@ import ConcreteSampleReport from '../reports/ConcreteSampleReport';
 import util from '../utils/utils';
 
 class ConcreteSampleController {
-  async getLateConcreteSamples(req, res, next) {
-    try {
-      return res.json({ message: 'ok' });
-    } catch (error) {
-      return next(error);
-    }
-  }
-
   async store(req, res, next) {
     const transaction = await ConcreteSample.sequelize.transaction();
     try {
