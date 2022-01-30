@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import * as Yup from 'yup';
-import { startOfDay } from 'date-fns';
+import { startOfDay, startOfTomorrow, addDays } from 'date-fns';
 
 import Client from '../../database/models/Client';
 import CompressionTest from '../../database/models/CompressionTest';
@@ -18,14 +18,23 @@ class CompressionTestController {
     try {
       const test = await CompressionTest.findAll({
         where: {
-          [Op.and]: [
-            { '$concreteSample.load$': 0 },
-            {
-              '$concreteSample.loaded_at$': {
+          '$concreteSample.load$': {
+            [Op.eq]: 0,
+          },
+
+          '$concreteSample.loaded_at$': {
+            [Op.or]: [
+              {
                 [Op.lte]: startOfDay(new Date()),
               },
-            },
-          ],
+              {
+                [Op.eq]: startOfTomorrow(),
+              },
+              {
+                [Op.eq]: startOfDay(new Date()),
+              },
+            ],
+          },
         },
         include: [
           {

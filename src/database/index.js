@@ -17,10 +17,12 @@ import ConcreteDesignMaterial from './models/ConcreteDesignMaterial';
 import MaterialTransaction from './models/MaterialTransaction';
 import MaterialFile from './models/MaterialFile';
 import MaterialToConcreteDesign from './models/MaterialToConcreteDesign';
+import Settings from './models/Settings';
 
 import config from '../config/database';
 
 const models = [
+  Settings,
   MaterialTransaction,
   ConcreteSample,
   CompressionTest,

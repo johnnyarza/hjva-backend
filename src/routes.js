@@ -23,6 +23,7 @@ import MaterialTransactionController from './app/controllers/MaterialTransaction
 import MaterialFileController from './app/controllers/MaterialFileController';
 import needsToBe from './app/middlewares/needsToBe';
 import MaterialToConcreteDesgin from './app/controllers/MaterialToConcreteDesgin';
+import SettingsController from './app/controllers/SettingsController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -37,6 +38,8 @@ routes.get(
   '/compressionTests/delayed',
   CompressionTestController.getDelayedCompressionTests
 );
+routes.get('/settings', SettingsController.index);
+routes.post('/setting', SettingsController.store);
 
 routes.get('/', (req, res) => res.json({ message: 'Hello world' }));
 routes.post('/user', UserController.store);
