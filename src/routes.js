@@ -40,8 +40,7 @@ routes.get(
 );
 routes.get('/settings', SettingsController.index);
 routes.post('/setting', SettingsController.store);
-routes.delete('/setting/:id', SettingsController.delete);
-routes.put('/setting/:id', SettingsController.update);
+
 routes.get('/setting/find', SettingsController.find);
 
 routes.get('/', (req, res) => res.json({ message: 'Hello world' }));
@@ -62,6 +61,17 @@ routes.get('/report/concreteSample', ConcreteSampleController.getReport);
 routes.post('/user', UserController.store);
 
 routes.use(auth);
+
+routes.delete(
+  '/setting/:id',
+  (req, res, next) => needsToBe(req, res, next, ['admin']),
+  SettingsController.delete
+);
+routes.put(
+  '/setting/:id',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  SettingsController.update
+);
 
 routes.get('/roles', RoleController.index);
 
