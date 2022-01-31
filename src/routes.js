@@ -40,6 +40,9 @@ routes.get(
 );
 routes.get('/settings', SettingsController.index);
 routes.post('/setting', SettingsController.store);
+routes.delete('/setting/:id', SettingsController.delete);
+routes.put('/setting/:id', SettingsController.update);
+routes.get('/setting/find', SettingsController.find);
 
 routes.get('/', (req, res) => res.json({ message: 'Hello world' }));
 routes.post('/user', UserController.store);
