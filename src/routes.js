@@ -27,22 +27,13 @@ import SettingsController from './app/controllers/SettingsController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
-// TODO apply auth to new routes
-routes.post('/materialToConcreteDesign', MaterialToConcreteDesgin.store);
-routes.get('/materialsToConcreteDesigns', MaterialToConcreteDesgin.index);
-routes.delete(
-  '/materialsToConcreteDesign/:id',
-  MaterialToConcreteDesgin.delete
-);
+
 routes.get(
   '/compressionTests/delayed',
   CompressionTestController.getDelayedCompressionTests
 );
 routes.get('/settings', SettingsController.index);
-routes.post('/setting', SettingsController.store);
-
 routes.get('/setting/find', SettingsController.find);
-
 routes.get('/', (req, res) => res.json({ message: 'Hello world' }));
 routes.post('/user', UserController.store);
 routes.post('/session', SessionController.store);
@@ -72,6 +63,7 @@ routes.put(
   (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
   SettingsController.update
 );
+routes.post('/setting', SettingsController.store);
 
 routes.get('/roles', RoleController.index);
 
@@ -242,6 +234,25 @@ routes.get(
   (req, res, next) =>
     needsToBe(req, res, next, ['laboratorio', 'admin', 'escritorio']),
   ConcreteDesignController.index
+);
+
+routes.post(
+  '/materialToConcreteDesign',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'admin', 'escritorio']),
+  MaterialToConcreteDesgin.store
+);
+routes.get(
+  '/materialsToConcreteDesigns',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'admin', 'escritorio']),
+  MaterialToConcreteDesgin.index
+);
+routes.delete(
+  '/materialsToConcreteDesign/:id',
+  (req, res, next) =>
+    needsToBe(req, res, next, ['laboratorio', 'admin', 'escritorio']),
+  MaterialToConcreteDesgin.delete
 );
 
 routes.post(
