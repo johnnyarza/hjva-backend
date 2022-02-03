@@ -24,10 +24,12 @@ import MaterialFileController from './app/controllers/MaterialFileController';
 import needsToBe from './app/middlewares/needsToBe';
 import MaterialToConcreteDesgin from './app/controllers/MaterialToConcreteDesgin';
 import SettingsController from './app/controllers/SettingsController';
+import PortifoliosController from './app/controllers/PortifoliosController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
 
+routes.get('/portifolios', PortifoliosController.index);
 routes.get(
   '/compressionTests/delayed',
   CompressionTestController.getDelayedCompressionTests
@@ -52,6 +54,10 @@ routes.get('/report/concreteSample', ConcreteSampleController.getReport);
 routes.post('/user', UserController.store);
 
 routes.use(auth);
+
+routes.post('/portifolio', PortifoliosController.store);
+routes.put('/portifolio/:id', PortifoliosController.update);
+routes.delete('/portifolio/:id', PortifoliosController.delete);
 
 routes.delete(
   '/setting/:id',

@@ -18,10 +18,12 @@ import MaterialTransaction from './models/MaterialTransaction';
 import MaterialFile from './models/MaterialFile';
 import MaterialToConcreteDesign from './models/MaterialToConcreteDesign';
 import Settings from './models/Settings';
+import Portifolio from './models/Portifolio';
 
 import config from '../config/database';
 
 const models = [
+  Portifolio,
   Settings,
   MaterialTransaction,
   ConcreteSample,
