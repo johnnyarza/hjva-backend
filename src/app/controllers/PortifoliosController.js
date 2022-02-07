@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 import Settings from '../../database/models/Settings';
 import Portifolio from '../../database/models/Portifolio';
+import PortifolioFile from '../../database/models/PortifolioFile';
 
 class PortifoliosController {
   async delete(req, res, next) {
@@ -56,7 +57,14 @@ class PortifoliosController {
 
   async index(req, res, next) {
     try {
-      const portifolios = await Portifolio.findAll();
+      const portifolios = await Portifolio.findAll({
+        include: [
+          {
+            model: PortifolioFile,
+            as: 'file',
+          },
+        ],
+      });
       return res.json(portifolios);
     } catch (error) {
       return next(error);

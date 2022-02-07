@@ -25,6 +25,7 @@ import needsToBe from './app/middlewares/needsToBe';
 import MaterialToConcreteDesgin from './app/controllers/MaterialToConcreteDesgin';
 import SettingsController from './app/controllers/SettingsController';
 import PortifoliosController from './app/controllers/PortifoliosController';
+import PortifolioFileController from './app/controllers/PortifolioFileController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -58,6 +59,11 @@ routes.use(auth);
 routes.post('/portifolio', PortifoliosController.store);
 routes.put('/portifolio/:id', PortifoliosController.update);
 routes.delete('/portifolio/:id', PortifoliosController.delete);
+routes.post(
+  '/portifolio/:id/file',
+  upload.single('file'),
+  PortifolioFileController.store
+);
 
 routes.delete(
   '/setting/:id',

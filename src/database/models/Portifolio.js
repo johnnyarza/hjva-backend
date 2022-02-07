@@ -19,6 +19,13 @@ class Portifolio extends Model {
     );
     return this;
   }
+
+  static associate(models) {
+    this.hasMany(models.PortifolioFile, {
+      foreignKey: 'portifolio_id',
+      as: 'file',
+    });
+  }
 }
 
 export default Portifolio;
