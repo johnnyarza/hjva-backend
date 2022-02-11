@@ -22,10 +22,25 @@ class PortifoliosController {
         return res.status(400).json({ message: 'Validation error' });
       }
 
-      const affectedRows = await Portifolio.destroy({ where: { id } });
+      const portifolio = await Portifolio.findByPk(id);
+      if (!portifolio) {
+        await transaction.rollback();
+        return res.status(404).json({ message: 'Portifolio no encontrado' });
+      }
+
+      const files = await PortifolioFile.findAll({
+        where: { portifolio_id: id },
+      });
+
+      await Promise.all(files.map((file) => file.destroy({ transaction })));
+
+      const portifolioAffectedRows = await Portifolio.destroy({
+        where: { id },
+        transaction,
+      });
 
       await transaction.commit();
-      return res.json(affectedRows);
+      return res.json(portifolioAffectedRows);
     } catch (error) {
       await transaction.rollback();
       return next(error);
