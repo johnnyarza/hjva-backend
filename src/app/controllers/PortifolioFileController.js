@@ -1,3 +1,4 @@
+import Portifolio from '../../database/models/Portifolio';
 import File from '../../database/models/PortifolioFile';
 
 class PortifolioFileController {
@@ -6,9 +7,13 @@ class PortifolioFileController {
       const { id } = req.params;
 
       if (!id) {
-        return res
-          .status(400)
-          .json({ error: 'Id do produto não foi informado' });
+        return res.status(400).json({ message: 'Id del portifolio vacío' });
+      }
+
+      const portifolio = await Portifolio.findByPk(id);
+
+      if (!portifolio) {
+        return res.status(400).json({ message: 'Portifolio no encontrado' });
       }
 
       const { originalname: name, size, key, location: url = '' } = req.file;
@@ -33,12 +38,12 @@ class PortifolioFileController {
       if (!id) {
         return res
           .status(400)
-          .json({ error: 'id do arquivo não foi informado' });
+          .json({ message: 'id do arquivo não foi informado' });
       }
       const file = await File.findByPk(id);
 
       if (!file) {
-        return res.status(400).json({ error: 'Arquivo não encontrado' });
+        return res.status(400).json({ message: 'Arquivo não encontrado' });
       }
 
       await file.destroy();

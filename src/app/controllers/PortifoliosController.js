@@ -60,10 +60,10 @@ class PortifoliosController {
         return res.status(400).json({ message: 'Validation error' });
       }
 
-      const setting = await Portifolio.create({ ...req.body });
+      const portifolio = await Portifolio.create({ ...req.body });
 
       await transaction.commit();
-      return res.json(setting);
+      return res.json(portifolio);
     } catch (error) {
       await transaction.rollback();
       return next(error);
@@ -102,7 +102,7 @@ class PortifoliosController {
         return res.status(400).json({ message: 'Validation error' });
       }
 
-      const portifolio = await Portifolio.findByPk(id, { transaction });
+      let portifolio = await Portifolio.findByPk(id, { transaction });
 
       if (!portifolio) {
         await transaction.rollback();
@@ -110,8 +110,17 @@ class PortifoliosController {
       }
 
       await portifolio.update(req.body);
-
       await transaction.commit();
+
+      portifolio = await Portifolio.findByPk(id, {
+        include: [
+          {
+            model: PortifolioFile,
+            as: 'file',
+          },
+        ],
+      });
+
       return res.json(portifolio);
     } catch (error) {
       await transaction.rollback();
