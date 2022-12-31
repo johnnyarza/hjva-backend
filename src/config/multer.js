@@ -1,9 +1,8 @@
 import multer from 'multer';
 import multerS3 from 'multer-s3';
-import aws from 'aws-sdk';
 import crypto from 'crypto';
-
 import { extname, resolve } from 'path';
+import s3 from './s3';
 
 const storageType = {
   local: multer.diskStorage({
@@ -17,7 +16,7 @@ const storageType = {
     },
   }),
   s3: multerS3({
-    s3: new aws.S3(),
+    s3,
     bucket: process.env.BUCKET_NAME,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     acl: 'public-read',

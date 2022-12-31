@@ -4,8 +4,7 @@ import aws from 'aws-sdk';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
-
-const s3 = new aws.S3();
+import s3 from '../../config/s3';
 
 class MaterialFile extends Model {
   static init(sequelize) {
@@ -20,8 +19,12 @@ class MaterialFile extends Model {
         hooks: {
           beforeCreate: (file, _) => {
             file.id = uuid();
+
             if (!file.url) {
               file.url = `${process.env.APP_URL}/files/${file.key}`;
+            }
+            if (file.url) {
+              file.url = `https://pub-62bbcaef549a40ed9559537835332214.r2.dev/${file.key}`;
             }
           },
 
