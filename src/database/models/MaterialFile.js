@@ -1,6 +1,5 @@
 import Sequelize, { Model } from 'sequelize';
 import { v4 as uuid } from 'uuid';
-import aws from 'aws-sdk';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
@@ -24,7 +23,7 @@ class MaterialFile extends Model {
               file.url = `${process.env.APP_URL}/files/${file.key}`;
             }
             if (file.url) {
-              file.url = `https://pub-62bbcaef549a40ed9559537835332214.r2.dev/${file.key}`;
+              file.url = `${process.env.PUBLIC_BUCKET_URL}/${file.key}`;
             }
           },
 

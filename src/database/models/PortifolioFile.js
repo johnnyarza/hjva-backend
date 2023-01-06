@@ -1,11 +1,9 @@
 import Sequelize, { Model } from 'sequelize';
 import { v4 as uuid } from 'uuid';
-import aws from 'aws-sdk';
 import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
-
-const s3 = new aws.S3();
+import s3 from '../../config/s3';
 
 class PortifolioFile extends Model {
   static init(sequelize) {
@@ -22,6 +20,9 @@ class PortifolioFile extends Model {
             file.id = uuid();
             if (!file.url) {
               file.url = `${process.env.APP_URL}/files/${file.key}`;
+            }
+            if (file.url) {
+              file.url = `${process.env.PUBLIC_BUCKET_URL}/${file.key}`;
             }
           },
 

@@ -30,13 +30,6 @@ import PortifolioFileController from './app/controllers/PortifolioFileController
 const routes = new Router();
 const upload = multer(multerConfig);
 
-routes.post('/testFile', upload.single('file'), (req, res) => {
-  const { file } = req;
-  const url = `https://pub-62bbcaef549a40ed9559537835332214.r2.dev/${file.key}`;
-  file.url = url;
-  return res.json(file);
-});
-
 routes.get('/portifolios', PortifoliosController.index);
 routes.get(
   '/compressionTests/delayed',
