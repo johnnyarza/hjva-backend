@@ -59,6 +59,7 @@ routes.use(auth);
 routes.post('/portifolio', PortifoliosController.store);
 routes.put('/portifolio/:id', PortifoliosController.update);
 routes.delete('/portifolio/:id', PortifoliosController.delete);
+routes.delete('/portifolio/:id/file', PortifolioFileController.delete);
 routes.post(
   '/portifolio/:id/file',
   upload.single('file'),
