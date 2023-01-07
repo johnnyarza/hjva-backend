@@ -128,16 +128,22 @@ class PortifoliosController {
     }
   }
 
-  async find(req, res, next) {
+  async findById(req, res, next) {
     try {
-      const { query } = req;
-      const queries = Object.entries(query);
+      const { id } = req.params;
 
-      if (queries.length === 0) {
-        return res.status(400).json({ message: 'QUery is empty' });
+      if (!id) {
+        return res.status(400).json({ message: 'Id is empty' });
       }
 
-      const setting = await Settings.findOne({ where: query });
+      const setting = await Portifolio.findByPk(id, {
+        include: [
+          {
+            model: PortifolioFile,
+            as: 'file',
+          },
+        ],
+      });
       return res.json(setting);
     } catch (error) {
       return next(error);

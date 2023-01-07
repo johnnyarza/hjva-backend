@@ -31,6 +31,7 @@ const routes = new Router();
 const upload = multer(multerConfig);
 
 routes.get('/portifolios', PortifoliosController.index);
+routes.get('/portifolio/:id', PortifoliosController.findById);
 routes.get(
   '/compressionTests/delayed',
   CompressionTestController.getDelayedCompressionTests
