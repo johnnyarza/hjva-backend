@@ -8,7 +8,7 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
       },
-      portifolio_id: {
+      setting_id: {
         type: DataTypes.UUID,
         references: { model: 'settings', key: 'id' },
         onUpdate: 'CASCADE',

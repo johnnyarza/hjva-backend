@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import Settings from '../../database/models/Settings';
+import File from '../../database/models/SettingFile';
 
 class SettingsController {
   async delete(req, res, next) {
@@ -92,6 +93,43 @@ class SettingsController {
       }
 
       await setting.update(req.body);
+
+      await transaction.commit();
+      return res.json(setting);
+    } catch (error) {
+      await transaction.rollback();
+      return next(error);
+    }
+  }
+
+  async updateByName(req, res, next) {
+    const transaction = await Settings.sequelize.transaction();
+    try {
+      const { name } = req.params;
+      const { value } = req.body;
+
+      const schema = Yup.object().shape({
+        value: Yup.string().required(),
+      });
+
+      if (!(await schema.isValid({ value }))) {
+        await transaction.rollback();
+        return res.status(400).json({ message: 'Validation error' });
+      }
+
+      if (!name) {
+        return res.status(400).json({ message: 'Name was not informed' });
+      }
+
+      const setting = await Settings.findOne(
+        { where: { name }, include: [{ model: File, as: 'file' }] },
+        { transaction }
+      );
+
+      if (!setting) {
+        await transaction.rollback();
+        return res.status(404).json({ message: 'Setting not found' });
+      }
 
       await transaction.commit();
       return res.json(setting);

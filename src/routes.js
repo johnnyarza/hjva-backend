@@ -26,6 +26,7 @@ import MaterialToConcreteDesgin from './app/controllers/MaterialToConcreteDesgin
 import SettingsController from './app/controllers/SettingsController';
 import PortifoliosController from './app/controllers/PortifoliosController';
 import PortifolioFileController from './app/controllers/PortifolioFileController';
+import SettingFilesController from './app/controllers/SettingFilesController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -67,6 +68,14 @@ routes.post(
   PortifolioFileController.store
 );
 
+routes.post(
+  '/setting/:id/file',
+  upload.single('file'),
+  SettingFilesController.store
+);
+
+routes.delete('/setting/:id/file', SettingFilesController.delete);
+
 routes.delete(
   '/setting/:id',
   (req, res, next) => needsToBe(req, res, next, ['admin']),
@@ -76,6 +85,11 @@ routes.put(
   '/setting/:id',
   (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
   SettingsController.update
+);
+routes.put(
+  '/setting/name/:name',
+  (req, res, next) => needsToBe(req, res, next, ['escritorio', 'admin']),
+  SettingsController.updateByName
 );
 routes.post('/setting', SettingsController.store);
 

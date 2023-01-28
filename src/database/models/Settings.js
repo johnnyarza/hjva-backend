@@ -19,6 +19,13 @@ class Settings extends Model {
     );
     return this;
   }
+
+  static associate(models) {
+    this.hasMany(models.SettingFile, {
+      foreignKey: 'setting_id',
+      as: 'file',
+    });
+  }
 }
 
 export default Settings;

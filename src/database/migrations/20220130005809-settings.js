@@ -27,6 +27,13 @@ module.exports = {
             created_at: new Date(),
             updated_at: new Date(),
           },
+          {
+            id: v4(),
+            name: 'CONTACTME_IMG_URL',
+            value: '',
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
         ]);
       });
   },
