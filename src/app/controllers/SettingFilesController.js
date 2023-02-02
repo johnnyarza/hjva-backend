@@ -6,7 +6,7 @@ class SettingFilesController {
       const { id } = req.params;
 
       if (!id) {
-        return res.status(400).json({ error: 'Id dela config no informado' });
+        return res.status(400).json({ error: 'Setting id was not informed' });
       }
 
       const { originalname: name, size, key, location: url = '' } = req.file;
@@ -14,7 +14,7 @@ class SettingFilesController {
       const file = await File.create({
         name,
         key,
-        product_id: id,
+        setting_id: id,
         url,
       });
 
@@ -29,19 +29,19 @@ class SettingFilesController {
       const { id } = req.params;
 
       if (!id) {
-        return res
-          .status(400)
-          .json({ error: 'Key do arquivo não foi informado' });
+        return res.status(400).json({ error: 'Setting key not informed' });
       }
-      const file = await File.findByPk(id);
+      const file = await File.findOne({ where: { setting_id: id } });
 
-      if (!file) {
-        return res.status(400).json({ error: 'Arquivo não encontrado' });
+      if (file) {
+        await file.destroy();
       }
 
-      await file.destroy();
+      // if (!file) {
+      //   return res.status(400).json({ error: 'Arquivo não encontrado' });
+      // }
 
-      return res.json(file);
+      return next();
     } catch (error) {
       return next(error);
     }

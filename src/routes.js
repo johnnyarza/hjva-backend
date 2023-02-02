@@ -70,11 +70,10 @@ routes.post(
 
 routes.post(
   '/setting/:id/file',
+  SettingFilesController.delete,
   upload.single('file'),
   SettingFilesController.store
 );
-
-routes.delete('/setting/:id/file', SettingFilesController.delete);
 
 routes.delete(
   '/setting/:id',

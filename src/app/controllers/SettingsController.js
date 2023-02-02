@@ -62,7 +62,9 @@ class SettingsController {
 
   async index(req, res, next) {
     try {
-      const settings = await Settings.findAll();
+      const settings = await Settings.findAll({
+        include: [{ model: File, as: 'file' }],
+      });
       return res.json(settings);
     } catch (error) {
       return next(error);
@@ -143,12 +145,16 @@ class SettingsController {
     try {
       const { query } = req;
       const queries = Object.entries(query);
+      console.log(query);
 
       if (queries.length === 0) {
-        return res.status(400).json({ message: 'QUery is empty' });
+        return res.status(400).json({ message: 'Query is empty' });
       }
 
-      const setting = await Settings.findOne({ where: query });
+      const setting = await Settings.findOne({
+        where: query,
+        include: [{ model: File, as: 'file' }],
+      });
       return res.json(setting);
     } catch (error) {
       return next(error);

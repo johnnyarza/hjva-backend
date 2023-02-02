@@ -29,7 +29,7 @@ module.exports = {
           },
           {
             id: v4(),
-            name: 'CONTACTME_IMG_URL',
+            name: 'CONTACTME_IMG',
             value: '',
             created_at: new Date(),
             updated_at: new Date(),
