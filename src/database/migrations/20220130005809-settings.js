@@ -34,6 +34,27 @@ module.exports = {
             created_at: new Date(),
             updated_at: new Date(),
           },
+          {
+            id: v4(),
+            name: 'ABOUTME_TITLE',
+            value: '',
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+          {
+            id: v4(),
+            name: 'ABOUTME_TEXT',
+            value: '',
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+          {
+            id: v4(),
+            name: 'ABOUTME_IMG',
+            value: '',
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
         ]);
       });
   },

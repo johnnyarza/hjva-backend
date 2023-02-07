@@ -78,8 +78,8 @@ class SettingsController {
       const { name, value } = req.body;
       const schema = Yup.object().shape({
         id: Yup.string().uuid().required(),
-        name: Yup.string(),
-        value: Yup.string(),
+        name: Yup.string().required(),
+        value: Yup.string().required(),
       });
 
       if (!(await schema.isValid({ id, name, value }))) {
@@ -145,7 +145,6 @@ class SettingsController {
     try {
       const { query } = req;
       const queries = Object.entries(query);
-      console.log(query);
 
       if (queries.length === 0) {
         return res.status(400).json({ message: 'Query is empty' });
